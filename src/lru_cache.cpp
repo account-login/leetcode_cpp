@@ -34,6 +34,18 @@ public:
     int get(int key) {
         auto found = this->content.find(key);
         if (found != this->content.end()) {
+            int value = found->second.value;
+            // refresh value
+            this->set(key, value);
+            return value;
+        } else {
+            return -1;
+        }
+    }
+
+    int peek(int key) {
+        auto found = this->content.find(key);
+        if (found != this->content.end()) {
             return found->second.value;
         } else {
             return -1;
@@ -72,18 +84,18 @@ TEST_CASE( "LRU Cache" ) {
     auto s = LRUCache(3);
 
     s.set(1, 3);
-    CHECK(s.get(1) == 3);
-    CHECK(s.get(5) == -1);
+    CHECK(s.peek(1) == 3);
+    CHECK(s.peek(5) == -1);
 
     s.set(2, 4);
     s.set(3, 6);
     s.set(4, 8);
-    CHECK(s.get(1) == -1);
+    CHECK(s.peek(1) == -1);
 
     s.set(1, 2);
-    CHECK(s.get(2) == -1);
+    CHECK(s.peek(2) == -1);
     s.set(3, 8);
-    CHECK((s.get(3) == 8 && s.get(4) == 8 && s.get(1) == 2));
+    CHECK((s.peek(3) == 8 && s.peek(4) == 8 && s.peek(1) == 2));
     CHECK(s.order.size() == 3);
     CHECK(s.content.size() == 3);
 }
