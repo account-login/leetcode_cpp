@@ -2,6 +2,7 @@
 #include <limits>
 #include <utility>
 #include <cmath>
+#include <cstdint>
 #include <cassert>
 
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
@@ -25,27 +26,34 @@ public:
             return MAX_INT;
         }
 
-        int ans = this->div_pos(abs(dividend), abs(divisor));
-        if (dividend * divisor < 0) {
+        int64_t a = dividend;
+        int64_t b = divisor;
+        int64_t ans = this->div_pos(abs(a), abs(b));
+        if (a * b < 0) {
             ans = -ans;
         }
-        return ans;
+        if (ans > std::numeric_limits<int>::max() || ans < std::numeric_limits<int>::min()) {
+            return MAX_INT;
+        } else {
+            return ans;
+        }
     }
 
-    pair<unsigned int, unsigned int> div_mod_pos(unsigned int a, unsigned int b) {
+    pair<uint64_t, uint64_t> div_mod_pos(uint64_t a, uint64_t b) {
         assert(b != 0);
         unsigned int shift = 0;
-        unsigned int sub = b;
+        uint64_t sub = b;
+        // TODO: test a bisect search
         while (sub < a) {
             sub <<= 1;
             shift += 1;
         }
 
-        int ans = 0;
+        uint64_t ans = 0;
         while (a >= b) {
             if (a >= sub) {
                 a -= sub;
-                ans += 1 << shift;
+                ans += ((uint64_t)1 << shift);
             }
             sub >>= 1;
             shift -= 1;
@@ -54,7 +62,7 @@ public:
         return make_pair(ans, a);
     }
 
-    unsigned int div_pos(unsigned int a, unsigned int b) {
+    uint64_t div_pos(uint64_t a, uint64_t b) {
         return this->div_mod_pos(a, b).first;
     }
 };
@@ -76,4 +84,7 @@ TEST_CASE("Divide Two Integers") {
     CHECK(s.divide(-9, -3) == 3);
     CHECK(s.divide(-10, -3) == 3);
     CHECK(s.divide(11, -3) == -3);
+
+    // overflowed
+    CHECK(s.divide(-2147483648, -1) == MAX_INT);
 }
