@@ -17,7 +17,7 @@ struct ValueWrapper {
     int value;
     list<int>::const_iterator pos;
 
-    ValueWrapper(int value, list<int>::iterator pos) : value(value), pos(pos) {}
+    ValueWrapper(int value, list<int>::const_iterator pos) : value(value), pos(pos) {}
 };
 
 
