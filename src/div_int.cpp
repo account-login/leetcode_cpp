@@ -25,25 +25,11 @@ public:
             return MAX_INT;
         }
 
-        if (dividend > 0) {
-            unsigned int div = this->div_pos(dividend, abs(divisor));
-            if (divisor < 0) {
-                div = -div;
-            }
-
-            return div;
-        } else {
-            unsigned int div, mod;
-            tie(div, mod) = this->div_mod_pos(abs(dividend), abs(divisor));
-            if (mod != 0) {
-                div += 1;
-            }
-            if (divisor > 0) {
-                div = -div;
-            }
-
-            return div;
+        int ans = this->div_pos(abs(dividend), abs(divisor));
+        if (dividend * divisor < 0) {
+            ans = -ans;
         }
+        return ans;
     }
 
     pair<unsigned int, unsigned int> div_mod_pos(unsigned int a, unsigned int b) {
@@ -85,9 +71,9 @@ TEST_CASE("Divide Two Integers") {
     CHECK(s.divide(7, 3) == 2);
     CHECK(s.divide(0, 8) == 0);
 
-    CHECK(s.divide(-7, 3) == -3);
+    CHECK(s.divide(-7, 3) == -2);
     CHECK(s.divide(-9, 3) == -3);
     CHECK(s.divide(-9, -3) == 3);
-    CHECK(s.divide(-10, -3) == 4);
+    CHECK(s.divide(-10, -3) == 3);
     CHECK(s.divide(11, -3) == -3);
 }
