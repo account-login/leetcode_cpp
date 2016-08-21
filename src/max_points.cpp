@@ -23,46 +23,13 @@ bool operator != (const Point &p1, const Point &p2) {
 }
 
 
-inline bool fcmp(double f1, double f2) {
-    if (f1 == 0.0) {
-        return f2 == 0.0;
-    } else {
-        double r = fabs(f2 / f1 - 1.0d);
-        return r <= 1e-5;
-    }
-}
-
-bool same_line(const Point &p1, const Point &p2, const Point &p3) {
+inline bool same_line(const Point &p1, const Point &p2, const Point &p3) {
     double dx1 = p1.x - p2.x;
     double dy1 = p1.y - p2.y;
     double dx2 = p2.x - p3.x;
     double dy2 = p2.y - p3.y;
 
-    if (dx1 == 0 && dy1 == 0) {
-        return true;
-    }
-    if (dx2 == 0 && dy2 == 0) {
-        return true;
-    }
-
-    if (dx1 == 0) {
-        return dx2 == 0;
-    } else {
-        if (dx2 == 0) {
-            return false;
-        } else {
-            return fcmp(dy1 / dx1, dy2 / dx2);
-        }
-    }
-    if (dy1 == 0) {
-        return dy2 == 0;
-    } else {
-        if (dy2 == 0) {
-            return false;
-        } else {
-            return fcmp(dx1 / dy1, dx2 / dy2);
-        }
-    }
+    return dy1 * dx2 == dy2 * dx1;
 }
 
 
