@@ -16,15 +16,15 @@ using namespace std;
 class Solution {
 public:
     string fractionToDecimal(int numerator, int denominator) {
-        int sign = numerator * denominator;
-        numerator = abs(numerator);
-        denominator = abs(denominator);
+        long long sign = (long long)numerator * denominator;
+        long long num = abs((long long)numerator);
+        long long den = abs((long long)denominator);
 
-        int integer = numerator / denominator;
-        int mod = numerator % denominator;
+        long long integer = num / den;
+        long long mod = num % den;
         mod *= 10;
 
-        unordered_map<int, size_t> mod2pos;
+        unordered_map<long long, size_t> mod2pos;
         vector<int> digits;
         size_t pos = 0;
 
@@ -40,10 +40,10 @@ public:
 
             mod2pos[mod] = pos;
 
-            int digit = mod / denominator;
+            int digit = mod / den;
             digits.push_back(digit);
 
-            mod %= denominator;
+            mod %= den;
             mod *= 10;
             pos++;
         }
@@ -89,4 +89,6 @@ TEST_CASE("Fraction to Recurring Decimal") {
     CHECK(s.fractionToDecimal(25, 13) == "1.(923076)");
     CHECK(s.fractionToDecimal(11, 6) == "1.8(3)");
     CHECK(s.fractionToDecimal(11, -6) == "-1.8(3)");
+
+    CHECK(s.fractionToDecimal(-1, -2147483648) == "0.0000000004656612873077392578125");
 }
