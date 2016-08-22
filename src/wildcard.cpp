@@ -91,9 +91,9 @@ public:
         }
     }
 
-    int find_word(const char *str, const char *pattern) {
+    // naive
+    int find_word_naive(const char *str, const char *pattern) {
         const char *str_begin = str;
-        // naive
         do {
             int jmp = this->cmp_word(str, pattern);
             if (jmp >= 0) {
@@ -104,6 +104,71 @@ public:
         } while (str[0] != '\0');
 
         return -1;
+    }
+
+    bool memcmp_question_mark(const char *buf1, const char *buf2, size_t size) {
+        for (size_t i = 0; i < size; i++) {
+            if (buf1[i] == '?' || buf2[i] == '?') {
+                continue;
+            }
+            if (buf1[i] != buf2[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    int match_partial(const char *str, const char *pattern) {
+        for (int ret = 0; ; ret++) {
+            if (pattern[ret] == '*' || pattern[ret] == '\0') {
+                return ret;
+            }
+            if (str[ret] == '\0') {
+                return -1;
+            }
+
+            if (pattern[ret] == '?') {
+                continue;
+            }
+            if (pattern[ret] != str[ret]) {
+                return ret;
+            }
+        }
+    }
+
+    // KMP
+    int find_word(const char *str, const char *pattern) {
+        int pattern_len = 0;
+        while (pattern[pattern_len] != '*' && pattern[pattern_len] != '\0') {
+            pattern_len++;
+        }
+
+        // TODO: optimize this
+        int jmp_table[pattern_len];
+        for (int i = 0; i < pattern_len; i++) {
+            jmp_table[i] = 1;
+            for (int j = 1; j <= i; j++) {
+                int size = i - j;
+                if (memcmp_question_mark(pattern + j, pattern, size)) {
+                    jmp_table[i] = j;
+                    break;
+                }
+            }
+        }
+
+        const char *origin_str = str;
+        while (true) {
+            int prefix_len = match_partial(str, pattern);
+            if (prefix_len < 0) {
+                return -1;
+            }
+
+            if (prefix_len == pattern_len) {
+                return str - origin_str + pattern_len;
+            }
+            str += jmp_table[prefix_len];
+        }
     }
 };
 
@@ -123,6 +188,8 @@ TEST_CASE("Wildcard Matching") {
     CHECK(s.isMatch("asdfasdf", "asdf*") == true);
     CHECK(s.isMatch("asdf", "as*sf") == false);
     CHECK(s.isMatch("asdf", "as*d") == false);
+    CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*sdfasdf*asdf") == true);
+    CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*dasdfaXsdf*asdf") == false);
 
     CHECK(s.isMatch("b", "?*?") == false);
     CHECK(s.isMatch("b", "*?*?*") == false);
