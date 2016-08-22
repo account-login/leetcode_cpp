@@ -65,7 +65,7 @@ public:
                     return false;
                 } else {
                     str += jmp;
-                    pattern += pos;
+                    pattern = pattern_begin + pos;
                     while (pattern[0] == '*') {
                         pattern++;
                     }
@@ -122,4 +122,5 @@ TEST_CASE("Wildcard Matching") {
     CHECK(s.isMatch("asdf", "as*d") == false);
 
     CHECK(s.isMatch("b", "?*?") == false);
+    CHECK(s.isMatch("b", "*?*?*") == false);
 }
