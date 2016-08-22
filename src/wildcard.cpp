@@ -23,6 +23,16 @@ public:
         if (jmp >= 0) {
             str += jmp;
             pattern += jmp;
+
+            // only one word, first word is last word
+            if (pattern[0] == '\0') {
+                if (str[0] != '\0') {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
             while (pattern[0] == '*') {
                 pattern++;
             }
@@ -35,6 +45,10 @@ public:
             if (pos == string::npos) {
                 // match last word
                 size_t last_pattern_len = p.size() - (pattern - pattern_begin);
+                if ((str - s.data()) + last_pattern_len > s.size()) {
+                    // str is shorter than pattern
+                    return false;
+                }
                 str = s.data() + (s.size() - (last_pattern_len));
                 jmp = this->cmp_word(str, pattern);
                 if (jmp < 0) {
@@ -98,6 +112,7 @@ TEST_CASE("Wildcard Matching") {
     CHECK(s.isMatch("", "") == true);
     CHECK(s.isMatch("aa", "aa") == true);
     CHECK(s.isMatch("a", "aa") == false);
+    CHECK(s.isMatch("aa", "a") == false);
     CHECK(s.isMatch("asdf", "**") == true);
     CHECK(s.isMatch("asdf", "a*s*f") == true);
     CHECK(s.isMatch("bbasdf", "*asdf") == true);
@@ -105,4 +120,6 @@ TEST_CASE("Wildcard Matching") {
     CHECK(s.isMatch("asdfasdf", "asdf*") == true);
     CHECK(s.isMatch("asdf", "as*sf") == false);
     CHECK(s.isMatch("asdf", "as*d") == false);
+
+    CHECK(s.isMatch("b", "?*?") == false);
 }
