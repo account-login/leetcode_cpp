@@ -70,6 +70,7 @@ public:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE("Divide Two Integers") {
     Solution s;
 
@@ -90,3 +91,4 @@ TEST_CASE("Divide Two Integers") {
     // overflowed
     CHECK(s.divide(-2147483648, -1) == MAX_INT);
 }
+#endif

@@ -219,6 +219,7 @@ public:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE( "126. Word Ladder II" ) {
     CHECK(word_cmp("asdf", "asdb") == true);
     CHECK(word_cmp("asdf", "asdf") == false);
@@ -262,3 +263,4 @@ TEST_CASE( "126. Word Ladder II" ) {
     };
     CHECK(s.findLadders("hit", "hit", words) == expects);
 }
+#endif

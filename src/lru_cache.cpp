@@ -82,6 +82,7 @@ public:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE( "LRU Cache" ) {
     auto s = LRUCache(3);
 
@@ -101,3 +102,4 @@ TEST_CASE( "LRU Cache" ) {
     CHECK(s.order.size() == 3);
     CHECK(s.content.size() == 3);
 }
+#endif

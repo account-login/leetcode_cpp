@@ -112,6 +112,7 @@ public:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE( "Same line" ) {
     CHECK(same_line(Point(0, 0), Point(0, 0), Point(0, 0)) == true);
 
@@ -165,4 +166,4 @@ TEST_CASE( "Max Points on a Line" ) {
     points = { Point(-4, -4), Point(-8, -582), Point(-3, 3), Point(-9, -651), Point(9, 591) };
     CHECK(s.maxPoints(points) == 3);
 }
-
+#endif

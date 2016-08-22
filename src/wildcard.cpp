@@ -108,6 +108,7 @@ public:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE("Wildcard Matching") {
     Solution s;
 
@@ -126,3 +127,4 @@ TEST_CASE("Wildcard Matching") {
     CHECK(s.isMatch("b", "?*?") == false);
     CHECK(s.isMatch("b", "*?*?*") == false);
 }
+#endif

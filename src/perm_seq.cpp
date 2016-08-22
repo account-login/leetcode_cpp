@@ -54,6 +54,7 @@ private:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE( "Permutation Sequence" ) {
     Solution s;
     CHECK( s.getPermutation(3, 1) == "123" );
@@ -63,3 +64,4 @@ TEST_CASE( "Permutation Sequence" ) {
     CHECK( s.getPermutation(3, 5) == "312" );
     CHECK( s.getPermutation(3, 6) == "321" );
 }
+#endif

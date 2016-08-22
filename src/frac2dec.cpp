@@ -81,6 +81,7 @@ public:
 };
 
 
+#ifdef RUN_TEST
 TEST_CASE("Fraction to Recurring Decimal") {
     Solution s;
 
@@ -94,3 +95,4 @@ TEST_CASE("Fraction to Recurring Decimal") {
 
     CHECK(s.fractionToDecimal(-1, -2147483648) == "0.0000000004656612873077392578125");
 }
+#endif
