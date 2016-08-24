@@ -10,7 +10,7 @@ clean:
 	rm -rf ./build/*
 
 %: build/%
-	
+	[[ -n "$(TEST)" ]] && ./build/$* -d yes -s || :
 
 build/%: src/%.cpp
 	$(CXX) $(CXXFLAGS) -o build/$* $<
