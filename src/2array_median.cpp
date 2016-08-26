@@ -38,23 +38,15 @@ public:
         for (size_t rm = r1; rm <= r2; rm++) {
             size_t sm = size_sum - rm;
             if (rm == 0) {
-                if (nums1.at(rm) < nums2.at(sm - 1)) {
+                if (nums1[rm] < nums2[sm - 1]) {
                     continue;
                 }
-            } else if (sm == 0) {
-                if (nums2.at(sm) < nums1.at(rm - 1)) {
-                    continue;
-                }
-            } else if (rm == nums1.size()) {
-                if (nums2.at(sm) < nums1.at(rm - 1)) {
-                    continue;
-                }
-            } else if (sm == nums2.size()) {
-                if (nums1.at(rm) < nums2.at(sm - 1)) {
+            } else if (sm == 0 || rm == nums1.size()) {
+                if (nums2[sm] < nums1[rm - 1]) {
                     continue;
                 }
             } else {
-                if (nums1.at(rm) < nums2.at(sm - 1)) {
+                if (nums1[rm] < nums2[sm - 1]) {
                     continue;
                 }
             }
@@ -65,25 +57,25 @@ public:
             if (rm == 0) {
                 a1 = INT_MIN;
             } else {
-                a1 = nums1.at(rm - 1);
+                a1 = nums1[rm - 1];
             }
 
             if (rm == nums1.size()) {
                 a2 = INT_MAX;
             } else {
-                a2 = nums1.at(rm);
+                a2 = nums1[rm];
             }
 
             if (sm == 0) {
                 b1 = INT_MIN;
             } else {
-                b1 = nums2.at(sm - 1);
+                b1 = nums2[sm - 1];
             }
 
             if (sm == nums2.size()) {
                 b2 = INT_MAX;
             } else {
-                b2 = nums2.at(sm);
+                b2 = nums2[sm];
             }
 
             if ((nums1.size() + nums2.size()) % 2 == 1) {
@@ -96,6 +88,7 @@ public:
         }
 
         assert(false);
+        return 0;   // remove -Wreturn
     }
 
     double median(const vector<int> &nums) {
@@ -107,9 +100,9 @@ public:
 
         int half = nums.size() / 2;
         if (nums.size() % 2 == 0) {
-            return (nums.at(half - 1) + nums.at(half)) / 2.0;
+            return (nums[half - 1] + nums[half]) / 2.0;
         } else {
-            return nums.at(half);
+            return nums[half];
         }
     }
 
