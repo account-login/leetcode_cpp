@@ -126,7 +126,7 @@ public:
             assert(rm != 0);
             assert(sm != 0);
 
-            if (a1.at(rm - 1) > a2.at(sm)) {
+            if (a1[rm - 1] > a2[sm]) {
                 r2 = rm;
             } else {
                 r1 = rm;
