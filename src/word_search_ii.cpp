@@ -231,7 +231,6 @@ public:
         for (auto child : tree->children) {
             if (child->type == END) {
                 ans.insert(child->str);
-                // TODO: remove found words
             } else {
                 for (auto &&point : {
                     Position(pos.x - 1, pos.y),
@@ -252,6 +251,21 @@ public:
                             }
                         }
                     }
+                }
+            }
+        }
+
+        // remove found words
+        auto size = tree->children.size();
+        for (size_t i = 0; i < size; i++) {
+            if (tree->children[i]->type == END) {
+                tree->children.erase(tree->children.begin() + i);
+                size--;
+            }
+            if (i < size) {
+                if (tree->children[i]->children.size() == 0) {
+                    tree->children.erase(tree->children.begin() + i);
+                    size--;
                 }
             }
         }
