@@ -126,19 +126,22 @@ public:
 
         size_t xlen = board.size();
         size_t ylen = board[0].size();
+
+        bool path[xlen][ylen];
+        for (size_t i = 0; i < xlen; i++) {
+            for (size_t j = 0; j < ylen; j++) {
+                path[i][j] = false;
+            }
+        }
+
         for (size_t x = 0; x < xlen; x++) {
             for (size_t y = 0; y < ylen; y++) {
                 for (auto tree : root->children) {
                     if (tree->letter == board[x][y]) {
                         auto pos = Position(x, y);
-                        bool path[xlen][ylen];
-                        for (size_t i = 0; i < xlen; i++) {
-                            for (size_t j = 0; j < ylen; j++) {
-                                path[i][j] = false;
-                            }
-                        }
                         path[x][y] = true;
                         search_tree(ans_str, board, tree, (bool *)path, pos);
+                        path[x][y] = false;
                         break;
                     }
                 }
