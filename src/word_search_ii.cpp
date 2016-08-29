@@ -44,14 +44,16 @@ namespace std {
 ///
 /// \brief The Tree struct
 ///
-enum NodeType { ROOT, NODE, END };
 struct Tree {
-    NodeType type;
     union {
         char letter;
         const char *str;
     };
     vector<Tree *> children;
+
+    bool is_end() const {
+        return this->children.size() == 0;
+    }
 };
 
 
@@ -65,25 +67,23 @@ public:
     void add_to_tree(Tree *tree, const string &word, size_t index = 0) {
         if (word[index] == '\0') {
             for (auto child : tree->children) {
-                if (child->type == END && strcmp(child->str, word.data()) == 0) {
+                if (child->is_end() && strcmp(child->str, word.data()) == 0) {
                     return;
                 }
             }
 
             auto end = new Tree;
-            end->type = END;
             end->str = word.data();
             tree->children.push_back(end);
             return;
         } else {
             for (auto child : tree->children) {
-                if (child->type == NODE && child->letter == word[index]) {
+                if (!child->is_end() && child->letter == word[index]) {
                     return add_to_tree(child, word, index + 1);
                 }
             }
 
             auto node = new Tree;
-            node->type = NODE;
             node->letter = word[index];
             tree->children.push_back(node);
             return add_to_tree(node, word, index + 1);
@@ -92,7 +92,6 @@ public:
 
     Tree *make_tree(const vector<string> &words) {
         auto root = new Tree;
-        root->type = ROOT;
         for (auto &word : words) {
             add_to_tree(root, word);
         }
@@ -229,7 +228,7 @@ public:
         auto xlen = board.size();
 
         for (auto child : tree->children) {
-            if (child->type == END) {
+            if (child->is_end()) {
                 ans.insert(child->str);
             } else {
                 for (auto &&point : {
@@ -258,15 +257,9 @@ public:
         // remove found words
         auto size = tree->children.size();
         for (size_t i = 0; i < size; i++) {
-            if (tree->children[i]->type == END) {
+            if (tree->children[i]->is_end()) {
                 tree->children.erase(tree->children.begin() + i);
                 size--;
-            }
-            if (i < size) {
-                if (tree->children[i]->children.size() == 0) {
-                    tree->children.erase(tree->children.begin() + i);
-                    size--;
-                }
             }
         }
     }
