@@ -89,5 +89,11 @@ TEST_CASE("140. Word Break II") {
 
     unordered_set<string> ans = { "cats and dog", "cat sand dog" };
     CHECK(s.word_break_set("catsanddog", { "cat", "cats", "and", "sand", "dog" }) == ans);
+
+    ans = { "asdf" };
+    CHECK(s.word_break_set("asdf", { "asdf" }) == ans);
+
+    ans = {};
+    CHECK(s.word_break_set("asdf", {}) == ans);
 }
 #endif
