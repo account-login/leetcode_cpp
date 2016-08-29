@@ -104,7 +104,6 @@ public:
         for (auto child : tree->children) {
             destroy_tree(child);
         }
-        // is destructor of tree->children called?
         delete tree;
     }
 
@@ -132,8 +131,14 @@ public:
                 for (auto tree : root->children) {
                     if (tree->letter == board[x][y]) {
                         auto pos = Position(x, y);
-                        unordered_set<Position> path = { pos };
-                        search_tree(ans_str, board, tree, path, pos);
+                        bool path[xlen][ylen];
+                        for (size_t i = 0; i < xlen; i++) {
+                            for (size_t j = 0; j < ylen; j++) {
+                                path[i][j] = false;
+                            }
+                        }
+                        path[x][y] = true;
+                        search_tree(ans_str, board, tree, (bool *)path, pos);
                         break;
                     }
                 }
@@ -214,7 +219,7 @@ public:
         unordered_set<const char *> &ans,
         const Board &board,
         Tree *tree,
-        unordered_set<Position> &path,  // TODO: replace unordered_set with a 2d-array
+        bool *path,
         Position pos
     ) {
         for (auto child : tree->children) {
@@ -228,16 +233,16 @@ public:
                     Position(pos.x, pos.y - 1),
                     Position(pos.x, pos.y + 1)
                 }) {
-                    if (0 <= point.x && point.x < board.size()
-                        && 0 <= point.y && point.y < board[0].size()
+                    auto x = point.x;
+                    auto y = point.y;
+                    if (0 <= x && x < board.size()
+                        && 0 <= y && y < board[0].size()
                     ) {
-                        auto found = path.find(point);
-                        if (found == path.end()) {
-                            if (board[point.x][point.y] == child->letter) {
-                                auto res = path.insert(point);
-                                assert(res.second == true);
+                        if (!path[x * board[0].size() + y]) {
+                            if (board[x][y] == child->letter) {
+                                path[x * board[0].size() + y] = true;
                                 search_tree(ans, board, child, path, point);
-                                path.erase(point);
+                                path[x * board[0].size() + y] = false;
                             }
                         }
                     }
