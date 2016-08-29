@@ -176,11 +176,11 @@ public:
         }
 
         // remove found words
-        auto size = tree->children.size();
-        for (size_t i = 0; i < size; i++) {
-            if (tree->children[i]->is_end()) {
-                tree->children.erase(tree->children.begin() + i);
-                size--;
+        auto &ch = tree->children;
+        for (size_t i = 0; i < ch.size(); i++) {
+            if (ch[i]->is_end()) {
+                delete ch[i];
+                ch.erase(ch.begin() + i);
             }
         }
     }
