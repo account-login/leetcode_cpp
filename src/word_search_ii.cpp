@@ -225,6 +225,9 @@ public:
         bool *path,
         Position pos
     ) {
+        auto ylen = board[0].size();
+        auto xlen = board.size();
+
         for (auto child : tree->children) {
             if (child->type == END) {
                 ans.insert(child->str);
@@ -238,14 +241,14 @@ public:
                 }) {
                     auto x = point.x;
                     auto y = point.y;
-                    if (0 <= x && x < board.size()
-                        && 0 <= y && y < board[0].size()
+                    if (0 <= x && x < xlen
+                        && 0 <= y && y < ylen
                     ) {
-                        if (!path[x * board[0].size() + y]) {
+                        if (!path[x * ylen + y]) {
                             if (board[x][y] == child->letter) {
-                                path[x * board[0].size() + y] = true;
+                                path[x * ylen + y] = true;
                                 search_tree(ans, board, child, path, point);
-                                path[x * board[0].size() + y] = false;
+                                path[x * ylen + y] = false;
                             }
                         }
                     }
