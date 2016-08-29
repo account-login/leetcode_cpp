@@ -27,19 +27,6 @@ struct Position {
     Position(size_t x, size_t y) : x(x), y(y) {}
 };
 
-bool operator == (const Position &p1, const Position &p2) {
-    return p1.x == p2.x && p1.y == p2.y;
-}
-
-namespace std {
-    template<>
-    struct hash<Position> {
-        size_t operator ()(const Position &point) const {
-            return point.x ^ point.y;
-        }
-    };
-}
-
 
 ///
 /// \brief The Tree struct
@@ -106,19 +93,6 @@ public:
         delete tree;
     }
 
-    vector<string> findWords_notree(const Board &board, const vector<string> &words) {
-        unordered_set<string> ans_set;
-
-        for (auto &word : words) {
-            if (solve_word(board, word)) {
-                ans_set.insert(word);
-            }
-        }
-
-        vector<string> ans(ans_set.begin(), ans_set.end());
-        return ans;
-    }
-
     vector<string> findWords(const Board &board, const vector<string> &words) {
         unordered_set<const char *> ans_str;
         auto root = make_tree(words);
@@ -162,59 +136,6 @@ public:
         unordered_set<string> ans(vec_ans.begin(), vec_ans.end());
 
         return ans;
-    }
-
-    bool solve_word(const Board &board, const string &word) {
-        size_t xlen = board.size();
-        size_t ylen = board[0].size();
-
-        for (size_t x = 0; x < xlen; x++) {
-            for (size_t y = 0; y < ylen; y++) {
-                if (board[x][y] == word[0]) {
-                    auto pos = Position(x, y);
-                    unordered_set<Position> path = { pos };
-                    bool ret = search_word(board, word.data() + 1, path, pos);
-                    if (ret) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    bool search_word(const Board &board, const char *word, unordered_set<Position> &path, Position last_pos) {
-        if (word[0] == '\0') {
-            return true;
-        }
-
-        for (auto &&point : {
-            Position(last_pos.x - 1, last_pos.y),
-            Position(last_pos.x + 1, last_pos.y),
-            Position(last_pos.x, last_pos.y - 1),
-            Position(last_pos.x, last_pos.y + 1)
-        }) {
-            if (0 <= point.x && point.x < board.size()
-                && 0 <= point.y && point.y < board[0].size()
-            ) {
-                auto found = path.find(point);
-                if (found == path.end()) {
-                    if (board[point.x][point.y] == word[0]) {
-                        auto res = path.insert(point);
-                        assert(res.second == true);
-                        bool ret = search_word(board, word + 1, path, point);
-                        path.erase(res.first);
-
-                        if (ret) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 
     void search_tree(
