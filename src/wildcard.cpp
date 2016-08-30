@@ -121,8 +121,8 @@ public:
         return true;
     }
 
-    int match_partial(const char *str, const char *pattern) {
-        for (int ret = 0; ; ret++) {
+    int match_partial(const char *str, const char *pattern, int start = 0) {
+        for (int ret = start; ; ret++) {
             if (pattern[ret] == '*' || pattern[ret] == '\0') {
                 return ret;
             }
@@ -160,8 +160,9 @@ public:
         }
 
         const char *origin_str = str;
+        int start = 0;
         while (true) {
-            int prefix_len = match_partial(str, pattern);
+            int prefix_len = match_partial(str, pattern, start);
             if (prefix_len < 0) {
                 return -1;
             }
@@ -169,7 +170,15 @@ public:
             if (prefix_len == pattern_len) {
                 return str - origin_str + pattern_len;
             }
-            str += jmp_table[prefix_len];
+
+            int jmp = jmp_table[prefix_len];
+            str += jmp;
+
+            if (prefix_len > 0) {
+                start = prefix_len - jmp;
+            } else {
+                start = 0;
+            }
         }
     }
 };
@@ -190,7 +199,7 @@ TEST_CASE("Wildcard Matching") {
     CHECK(s.isMatch("asdfasdf", "asdf*") == true);
     CHECK(s.isMatch("asdf", "as*sf") == false);
     CHECK(s.isMatch("asdf", "as*d") == false);
-    CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*sdfasdf*asdf") == true);
+    CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*sdfasdfasdf*asdf") == true);
     CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*dasdfaXsdf*asdf") == false);
 
     CHECK(s.isMatch("b", "?*?") == false);
