@@ -19,11 +19,19 @@ using namespace std;
 class Solution {
 public:
     bool isRectangleCover(const vector<vector<int>> &rectangles) {
-        for (size_t i = 0; i < rectangles.size() - 1; i++) {
-            for (size_t j = i + 1; j < rectangles.size(); j++) {
-                if (is_overlap(rectangles[i], rectangles[j])) {
+        vector<vector<int>> tested = { rectangles[0] };
+        for (size_t i = 1; i < rectangles.size(); i++) {
+            bool merged = false;
+            auto &rect = rectangles[i];
+            for (auto &rect_tested : tested) {
+                if (is_overlap(rect_tested, rect)) {
                     return false;
+                } else {
+                    merged = try_merge(rect_tested, rect);
                 }
+            }
+            if (!merged) {
+                tested.push_back(rect);
             }
         }
 
@@ -59,6 +67,12 @@ public:
         return area_sum == (t - b) * (r - l);
     }
 
+    ///
+    /// \brief is r1 and r2 overlaps
+    /// \param r1
+    /// \param r2
+    /// \return
+    ///
     bool is_overlap(const vector<int> &r1, const vector<int> &r2) {
         int la = r1[0];
         int ba = r1[1];
@@ -81,6 +95,50 @@ public:
             return false;
         }
     }
+
+    ///
+    /// \brief merge r2 into r1 if posible
+    /// \param r1
+    /// \param r2
+    /// \return merged?
+    ///
+    bool try_merge(vector<int> &r1, const vector<int> &r2) {
+        assert(!is_overlap(r1, r2));
+
+        int &la = r1[0];
+        int &ba = r1[1];
+        int &ra = r1[2];
+        int &ta = r1[3];
+
+        int lb = r2[0];
+        int bb = r2[1];
+        int rb = r2[2];
+        int tb = r2[3];
+
+        if (la == lb && ra == rb) {
+            if (ta == bb) {
+                ta = tb;
+                return true;
+            }
+            if (ba == tb) {
+                ba = bb;
+                return true;
+            }
+        }
+
+        if (ta == tb && ba == bb) {
+            if (ra == lb) {
+                ra = rb;
+                return true;
+            }
+            if (la == rb) {
+                la = lb;
+                return true;
+            }
+        }
+
+        return false;
+    }
 };
 
 
@@ -92,6 +150,20 @@ TEST_CASE("Test is_overlap()") {
     CHECK(s.is_overlap({ 0, 0, 3, 3 }, { -1, 1, 5, 2 }) == true);
     CHECK(s.is_overlap({ 0, 0, 5, 5 }, { 1, 1, 2, 2 }) == true);
     CHECK(s.is_overlap({ 0, 0, 5, 5 }, { -1, 1, 1, 2 }) == true);
+}
+
+TEST_CASE("Test try_merge()") {
+    Solution s;
+
+    vector<int> rect = { 0, 0, 1, 1 };
+    CHECK(s.try_merge(rect, { 0, 1, 1, 2 }) == true);
+    vector<int> ans = { 0, 0, 1, 2 };
+    CHECK(rect == ans);
+
+    rect = { 0, 0, 5, 5 };
+    ans = rect;
+    CHECK(s.try_merge(rect, { 0, 5, 4, 8 }) == false);
+    CHECK(rect == ans);
 }
 
 TEST_CASE("391. Perfect Rectangle") {
@@ -129,5 +201,11 @@ TEST_CASE("391. Perfect Rectangle") {
         {2,2,4,4}
     };
     CHECK(s.isRectangleCover(rects) == false);
+
+    rects = {};
+    for (int i = 0; i <= 9999; i++) {
+        rects.push_back({ 0, i - 1, 1, i });
+    }
+    CHECK(s.isRectangleCover(rects) == true);
 }
 #endif
