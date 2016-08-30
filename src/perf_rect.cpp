@@ -19,6 +19,14 @@ using namespace std;
 class Solution {
 public:
     bool isRectangleCover(const vector<vector<int>> &rectangles) {
+        for (size_t i = 0; i < rectangles.size() - 1; i++) {
+            for (size_t j = i + 1; j < rectangles.size(); j++) {
+                if (is_overlap(rectangles[i], rectangles[j])) {
+                    return false;
+                }
+            }
+        }
+
         int l = numeric_limits<int>::max();
         int b = numeric_limits<int>::max();
         int r = numeric_limits<int>::min();
@@ -50,10 +58,42 @@ public:
 
         return area_sum == (t - b) * (r - l);
     }
+
+    bool is_overlap(const vector<int> &r1, const vector<int> &r2) {
+        int la = r1[0];
+        int ba = r1[1];
+        int ra = r1[2];
+        int ta = r1[3];
+
+        int lb = r2[0];
+        int bb = r2[1];
+        int rb = r2[2];
+        int tb = r2[3];
+
+        int lc = max(la, lb);
+        int rc = min(ra, rb);
+        int tc = min(ta, tb);
+        int bc = max(ba, bb);
+
+        if (lc < rc && tc > bc) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 };
 
 
 #ifdef RUN_TEST
+TEST_CASE("Test is_overlap()") {
+    Solution s;
+
+    CHECK(s.is_overlap({ 0, 0, 1, 1 }, { 1, 0, 2, 1 }) == false);
+    CHECK(s.is_overlap({ 0, 0, 3, 3 }, { -1, 1, 5, 2 }) == true);
+    CHECK(s.is_overlap({ 0, 0, 5, 5 }, { 1, 1, 2, 2 }) == true);
+    CHECK(s.is_overlap({ 0, 0, 5, 5 }, { -1, 1, 1, 2 }) == true);
+}
+
 TEST_CASE("391. Perfect Rectangle") {
     Solution s;
 
