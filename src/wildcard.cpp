@@ -79,7 +79,7 @@ public:
     }
 
     /**
-     * @brief Find out weither str starts with first word of \a pattern.
+     * @brief Find out weither \a str starts with first word of \a pattern.
      *
      *        \a pattern is a sequence of word seperated by '*'.
      *        A word may contain '?'.
