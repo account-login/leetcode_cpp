@@ -1,6 +1,5 @@
 #include <iostream>
 #include <unordered_set>
-#include <deque>
 
 #ifdef RUN_TEST
 #   define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
@@ -73,20 +72,21 @@ public:
         // = O( len(word) * len(s) )
         for (int start = 0; start < word_len && start <= (int)s.size() - block_len; start++) {
             unordered_multiset<string> visited;
-            deque<string> q;
+            size_t queue_size = 0;
             size_t word_idx = 0;
             unordered_set<string> ok_word;
 
             while (start + (word_idx + 1) * word_len <= s.size()) {
-                string word = s.substr(start + word_idx * word_len, word_len);
+                int word_pos = start + word_idx * word_len;
+                string word = s.substr(word_pos, word_len);
                 if (word_set.count(word) == 0) {
                     // not matched, clear queue & set
-                    q.clear();
+                    queue_size = 0;
                     visited.clear();
-                    ok_word = {};
+                    ok_word.clear();
                 } else {
                     // new matched word
-                    q.push_back(word);
+                    queue_size++;
                     visited.insert(word);
 
                     // visited counter modified, adjust ok_word set
@@ -97,26 +97,28 @@ public:
                     }
 
                     // queue too long, drop front
-                    if (q.size() > words.size()) {
-                        auto &front = q.front();
+                    if (queue_size > words.size()) {
+                        assert(queue_size == words.size() + 1);
+                        int index = word_pos - (queue_size - 1) * word_len;
+                        string queue_front = s.substr(index, word_len);
 
                         // decrease found word count
-                        visited.erase(visited.equal_range(front).first);
+                        visited.erase(visited.equal_range(queue_front).first);
 
                         // visited counter modified, adjust ok_word set
-                        if (visited.count(front) == word_set.count(front)) {
-                            ok_word.insert(front);
+                        if (visited.count(queue_front) == word_set.count(queue_front)) {
+                            ok_word.insert(queue_front);
                         } else {
-                            ok_word.erase(front);
+                            ok_word.erase(queue_front);
                         }
 
-                        q.pop_front();
-                        assert(q.size() == words.size());
+                        queue_size--;
+                        assert(queue_size == words.size());
                     }
 
                     // anwser found
-                    if (q.size() == words.size() && ok_word.size() == uniq_word_count) {
-                        int index = start + (word_idx - words.size() + 1) * word_len;
+                    if (queue_size == words.size() && ok_word.size() == uniq_word_count) {
+                        int index = word_pos - (queue_size - 1) * word_len;
                         ans.push_back(index);
                     }
                 }
