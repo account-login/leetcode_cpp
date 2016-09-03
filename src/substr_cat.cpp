@@ -29,16 +29,17 @@ public:
         int block_len = word_len * words.size();
 
         unordered_map<string, int> word2id;
+        vector<int> word_count;
+        int uniq_word_count = 0;
         for (size_t i = 0; i < words.size(); i++) {
             if (word2id.count(words[i]) == 0) {
-                word2id[words[i]] = i;
+                word2id[words[i]] = uniq_word_count;
+                uniq_word_count++;
+                word_count.push_back(1);
+            } else {
+                int word_id = word2id[words[i]];
+                word_count[word_id]++;
             }
-        }
-        int uniq_word_count = word2id.size();
-
-        vector<int> word_count(uniq_word_count, 0);
-        for (auto &word : words) {
-            word_count[word2id[word]]++;
         }
 
         vector<int> ans;
