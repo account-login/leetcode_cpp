@@ -52,6 +52,7 @@ public:
             size_t queue_size = 0;
             size_t word_idx = 0;
             vector<bool> ok_word(uniq_word_count, false);
+            int ok_word_count = 0;
 
             while (start + (word_idx + 1) * word_len <= s.size()) {
                 int word_pos = start + word_idx * word_len;
@@ -63,6 +64,7 @@ public:
                     queue_size = 0;
                     fill(visited.begin(), visited.end(), 0);
                     fill(ok_word.begin(), ok_word.end(), false);
+                    ok_word_count = 0;
                 } else {
                     // new matched word
                     int id = found->second;
@@ -71,10 +73,16 @@ public:
 
                     // visited counter modified, adjust ok_word set
                     if (visited[id] == word_count[id]) {
+                        assert(ok_word[id] == false);
                         ok_word[id] = true;
+                        ok_word_count++;
                     } else {
-                        ok_word[id] = false;
+                        if (ok_word[id] == true) {
+                            ok_word[id] = false;
+                            ok_word_count--;
+                        }
                     }
+                    assert(count(ok_word.begin(), ok_word.end(), true) == ok_word_count);
 
                     // queue too long, drop front
                     if (queue_size > words.size()) {
@@ -88,10 +96,16 @@ public:
 
                         // visited counter modified, adjust ok_word set
                         if (visited[front_id] == word_count[front_id]) {
+                            assert(ok_word[front_id] == false);
                             ok_word[front_id] = true;
+                            ok_word_count++;
                         } else {
-                            ok_word[front_id] = false;
+                            if (ok_word[front_id] == true) {
+                                ok_word[front_id] = false;
+                                ok_word_count--;
+                            }
                         }
+                        assert(count(ok_word.begin(), ok_word.end(), true) == ok_word_count);
 
                         queue_size--;
                         assert(queue_size == words.size());
@@ -99,7 +113,7 @@ public:
 
                     // anwser found
                     if (queue_size == words.size()
-                        && count(ok_word.begin(), ok_word.end(), true) == uniq_word_count)
+                        && ok_word_count == uniq_word_count)
                     {
                         int index = word_pos - (queue_size - 1) * word_len;
                         ans.push_back(index);
@@ -184,6 +198,9 @@ TEST_CASE("30. Substring with Concatenation of All Words") {
 
     ans = { 8 };
     CHECK(s.findSubstring("wordgoodgoodgoodbestword", { "word", "good", "best", "good" }) == ans);
+
+    ans = { 0, 2, 4 };
+    CHECK(s.findSubstring("abababab", { "a", "b", "a" }) == ans);
 
     string str = "";
     for (int i = 0; i < 5000; i++) {
