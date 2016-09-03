@@ -48,10 +48,12 @@ public:
         //    ^ start     ^ word_idx             ^ hash
         // = O( len(word) * len(s) )
         for (int start = 0; start < word_len && start <= (int)s.size() - block_len; start++) {
+            // counter
             vector<int> visited(uniq_word_count, 0);
+            // changes in sync with visited
+            vector<bool> ok_word(uniq_word_count, false);
             size_t queue_size = 0;
             size_t word_idx = 0;
-            vector<bool> ok_word(uniq_word_count, false);
 
             while (start + (word_idx + 1) * word_len <= s.size()) {
                 int word_pos = start + word_idx * word_len;
@@ -59,7 +61,7 @@ public:
 
                 auto found = word2id.find(word);
                 if (found == word2id.end()) {
-                    // not matched, clear queue & set
+                    // not matched, clear queue & counter
                     queue_size = 0;
                     fill(visited.begin(), visited.end(), 0);
                     fill(ok_word.begin(), ok_word.end(), false);
