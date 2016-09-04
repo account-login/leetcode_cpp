@@ -66,10 +66,6 @@ public:
     int calculateMinimumHP(const vector<vector<int>> &dungeon) {
         int xlen = dungeon.size();
         int ylen = dungeon[0].size();
-        // first path not checked in loop
-        if (xlen == 1 && ylen == 1) {
-            return 1 - dungeon[0][0];
-        }
 
         auto cmp = [](const Path &p1, const Path &p2) -> bool {
             // shortest path on top
@@ -83,6 +79,10 @@ public:
             q.pop();
 
             const Pos &cur = path.pos;
+            // exit
+            if (cur == Pos(xlen - 1, ylen - 1)) {
+                return path.start_hp;
+            }
 
             for (const Pos &neighbor : {
                     Pos(cur.x - 1, cur.y),
@@ -106,11 +106,6 @@ public:
                     if (new_path.hp <= 0) {
                         new_path.start_hp += 1 - new_path.hp;
                         new_path.hp = 1;
-                    }
-
-                    // exit
-                    if (neighbor == Pos(xlen - 1, ylen - 1)) {
-                        return new_path.start_hp;
                     }
 
                     q.push(new_path);
@@ -154,6 +149,36 @@ TEST_CASE("174. Dungeon Game") {
 
     board = {
         { 0, -1, 5 }
+    };
+    CHECK(s.calculateMinimumHP(board) == 2);
+
+    board = {
+        { 0,  0,  1 },
+        { 0, -1,  0 },
+        { 0,  0, -1 }
+    };
+    CHECK(s.calculateMinimumHP(board) == 1);
+
+    board = {
+        { 0,  0,  0 },
+        { 0, -1,  0 },
+        { 1,  0, -1 }
+    };
+    CHECK(s.calculateMinimumHP(board) == 1);
+
+    board = {
+        {  0,  0, -1,  5 },
+        {  0, -1, -1,  0 },
+        {  0, -1, -1,  0 },
+        {  0,  0,  0, -3 }
+    };
+    CHECK(s.calculateMinimumHP(board) == 2);
+
+    board = {
+        {  0,  0,  0,  0 },
+        {  0, -1, -1,  0 },
+        { -1, -1, -1,  0 },
+        {  5,  0,  0, -3 }
     };
     CHECK(s.calculateMinimumHP(board) == 2);
 }
