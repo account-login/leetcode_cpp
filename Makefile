@@ -18,3 +18,5 @@ clean:
 
 build/%: src/%.cpp
 	$(CXX) $(CXXFLAGS) -o build/$* $<
+
+src/%.cpp: src/catch.hpp
