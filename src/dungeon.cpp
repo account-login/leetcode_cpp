@@ -43,20 +43,28 @@ namespace std {
 /// \brief The Path struct
 struct Path {
     Pos pos;                    ///< current position
-    int hp;                     ///< current hp
     int start_hp;               ///< minimum hp to start
+    int hp;                     ///< current hp
     unordered_set<Pos> nodes;   ///< visited position
 
-    Path(Pos pos, int start_hp, int hp = 1) {
-        this->pos = pos;
-        this->start_hp = start_hp;
-        this->hp = hp;
+    Path(Pos pos, int start_hp, int hp = 1)
+        : pos(pos), start_hp(start_hp), hp(hp)
+    {
+        // start_hp must be positive
+        if (this->start_hp <= 0) {
+            this->hp += 1 - this->start_hp;
+            this->start_hp = 1;
+        }
         this->nodes.insert(pos);
     }
 };
 
 bool operator < (const Path &p1, const Path &p2) {
-    return (p1.start_hp < p2.start_hp);
+    if (p1.start_hp == p2.start_hp) {
+        return p1.hp > p2.hp;
+    } else {
+        return p1.start_hp < p2.start_hp;
+    }
 }
 
 
@@ -72,7 +80,8 @@ public:
             return !(p1 < p2);
         };
         using queue_t = priority_queue<Path, vector<Path>, decltype(cmp)>;
-        queue_t q(cmp, { Path(Pos(0, 0), 1 - dungeon[0][0]) });
+        Path p0 = Path(Pos(0, 0), 1 - dungeon[0][0]);
+        queue_t q(cmp, { p0 });
 
         while (true) {
             Path path = q.top();
@@ -81,6 +90,7 @@ public:
             const Pos &cur = path.pos;
             // exit
             if (cur == Pos(xlen - 1, ylen - 1)) {
+                assert(path.start_hp > 0);
                 return path.start_hp;
             }
 
@@ -148,6 +158,11 @@ TEST_CASE("174. Dungeon Game") {
     CHECK(s.calculateMinimumHP(board) == 1);
 
     board = {
+        { 5 }
+    };
+    CHECK(s.calculateMinimumHP(board) == 1);
+
+    board = {
         { 0, -1, 5 }
     };
     CHECK(s.calculateMinimumHP(board) == 2);
@@ -181,5 +196,17 @@ TEST_CASE("174. Dungeon Game") {
         {  5,  0,  0, -3 }
     };
     CHECK(s.calculateMinimumHP(board) == 2);
+
+    board = {
+        {  0, -74, -47, -20, -23, -39, -48},
+        { 37, -30,  37, -65, -82,  28, -27},
+        {-76, -33,   7,  42,   3,  49, -93},
+        { 37, -41,  35, -16, -96, -56,  38},
+        {-52,  19, -37,  14, -65, -42,   9},
+        {  5, -26, -30, -65,  11,   5,  16},
+        {-60,   9,  36, -36,  41, -47, -86},
+        {-22,  19,  -5, -41,  -8, -96, -95}
+    };
+    CHECK(s.calculateMinimumHP(board) == 1);
 }
 #endif
