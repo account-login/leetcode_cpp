@@ -6,7 +6,7 @@ CXXFLAGS += -Wall -g -std=gnu++11 -DRUN_TEST=1
 
 LEETCODES = perm_seq word_ladder max_points lru_cache div_int frac2dec wildcard \
             atoi valid_num 2array_median word_search_ii decode_ways word_break_ii \
-            perf_rect text_just short_palin substr_cat dungeon
+            perf_rect text_just short_palin substr_cat dungeon 3sum
 
 all: $(LEETCODES)
 
