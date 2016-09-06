@@ -3,7 +3,6 @@
 #include <unordered_set>
 #include <tuple>
 #include <vector>
-#include <initializer_list>
 
 #ifdef RUN_TEST
 #   define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
@@ -48,8 +47,9 @@ public:
         int end = nums.size();
         while (begin <= end - 3) {
             // maximum end optimization
-            while (nums[begin] + nums[begin + 1] + nums[end - 1] > 0 && begin < end - 3) {
+            if (nums[begin] + nums[begin + 1] + nums[end - 1] > 0) {
                 end--;
+                continue;
             }
 
             // minimum begin optimiaztion
@@ -72,9 +72,9 @@ public:
                     }
                     k--;
                     // this is not necessary
-                    while (nums[k] == nums[k + 1] && j < k) {
-                        k--;
-                    }
+                    // while (nums[k] == nums[k + 1] && j < k) {
+                    //     k--;
+                    // }
                 } else if (sum < 0) {
                     j++;
                 } else {    // sum > 0
