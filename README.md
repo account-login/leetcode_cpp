@@ -37,11 +37,11 @@ Solutions for leetcode using c++11.
 |-----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|------|-------|
 | [60. Permutation Sequence](<https://leetcode.com/problems/permutation-sequence/>)                                           | [perm_seq](<src/perm_seq.cpp>)             |      |       |
 | [126. Word Ladder II](<https://leetcode.com/problems/word-ladder-ii/>)                                                      | [word_ladder_ii](<src/word_ladder_ii.cpp>) |      |       |
-| [Max Points on a Line](<https://leetcode.com/problems/max-points-on-a-line/>)                                               | [max_points](<src/max_points.cpp>)         |      |       |
-| [LRU Cache](<https://leetcode.com/problems/lru-cache/>)                                                                     | [lru_cache](<src/lru_cache.cpp>)           |      |       |
-| [Divide Two Integers](<https://leetcode.com/problems/divide-two-integers/>)                                                 | [div_int](<src/div_int.cpp>)               |      |       |
-| [Fraction to Recurring Decimal](<https://leetcode.com/problems/fraction-to-recurring-decimal/>)                             | [frac2dec](<src/frac2dec.cpp>)             |      |       |
-| [Wildcard Matching](<https://leetcode.com/problems/wildcard-matching/>)                                                     | [wildcard](<src/wildcard.cpp>)             |      |       |
+| [149. Max Points on a Line](<https://leetcode.com/problems/max-points-on-a-line/>)                                          | [max_points](<src/max_points.cpp>)         |      |       |
+| [146. LRU Cache](<https://leetcode.com/problems/lru-cache/>)                                                                | [lru_cache](<src/lru_cache.cpp>)           |      |       |
+| [29. Divide Two Integers](<https://leetcode.com/problems/divide-two-integers/>)                                             | [div_int](<src/div_int.cpp>)               |      |       |
+| [166. Fraction to Recurring Decimal](<https://leetcode.com/problems/fraction-to-recurring-decimal/>)                        | [frac2dec](<src/frac2dec.cpp>)             |      |       |
+| [44. Wildcard Matching](<https://leetcode.com/problems/wildcard-matching/>)                                                 | [wildcard](<src/wildcard.cpp>)             |      |       |
 | [8. String to Integer (atoi)](<https://leetcode.com/problems/string-to-integer-atoi/>)                                      | [atoi](<src/atoi.cpp>)                     |      |       |
 | [65. Valid Number](<https://leetcode.com/problems/valid-number/>)                                                           | [valid_num](<src/valid_num.cpp>)           |      |       |
 | [4. Median of Two Sorted Arrays](<https://leetcode.com/problems/median-of-two-sorted-arrays/>)                              | [2array_median](<src/2array_median.cpp>)   |      |       |

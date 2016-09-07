@@ -73,7 +73,7 @@ public:
 
 
 #ifdef RUN_TEST
-TEST_CASE("Divide Two Integers") {
+TEST_CASE("29. Divide Two Integers") {
     Solution s;
 
     CHECK(s.div_pos(4, 2) == 2);

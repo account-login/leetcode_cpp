@@ -225,7 +225,7 @@ public:
 
 
 #ifdef RUN_TEST
-TEST_CASE("Wildcard Matching") {
+TEST_CASE("44. Wildcard Matching") {
     Solution s;
 
     CHECK(s.isMatch("", "") == true);

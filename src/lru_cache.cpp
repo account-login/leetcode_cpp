@@ -85,7 +85,7 @@ public:
 
 
 #ifdef RUN_TEST
-TEST_CASE( "LRU Cache" ) {
+TEST_CASE( "146. LRU Cache" ) {
     auto s = LRUCache(3);
 
     s.set(1, 3);

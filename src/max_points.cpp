@@ -138,7 +138,7 @@ TEST_CASE( "Same line" ) {
     CHECK(same_line(Point(5, 2), Point(0, 7), Point(1, 1)) == false);
 }
 
-TEST_CASE( "Max Points on a Line" ) {
+TEST_CASE( "149. Max Points on a Line" ) {
     Solution s;
 
     vector<Point> points = { Point(0, 1), Point(2, 3) };

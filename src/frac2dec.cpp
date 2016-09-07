@@ -84,7 +84,7 @@ public:
 
 
 #ifdef RUN_TEST
-TEST_CASE("Fraction to Recurring Decimal") {
+TEST_CASE("166. Fraction to Recurring Decimal") {
     Solution s;
 
     CHECK(s.fractionToDecimal(0, 2) == "0");
