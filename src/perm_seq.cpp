@@ -57,7 +57,7 @@ private:
 
 
 #ifdef RUN_TEST
-TEST_CASE( "Permutation Sequence" ) {
+TEST_CASE( "60. Permutation Sequence" ) {
     Solution s;
     CHECK( s.getPermutation(3, 1) == "123" );
     CHECK( s.getPermutation(3, 2) == "132" );
