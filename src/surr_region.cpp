@@ -34,7 +34,7 @@ public:
         for (int x = 0; x < xlen; x++) {
             for (int y = 0; y < ylen; y++) {
                 if (board[x][y] == 'O') {
-                    bool result = explore(board, x, y);
+                    bool result = fill(board, x, y, '#');
                     if (result) {
                         fill(board, x, y, 'X');
                     }
@@ -51,9 +51,10 @@ public:
         }
     }
 
-    bool explore(vector<vector<char>> &board, int x, int y) {
+    bool fill(vector<vector<char>> &board, int x, int y, char color) {
         int xlen = board.size();
         int ylen = board[0].size();
+        char orig_color = board[x][y];
 
         bool ret = true;
 
@@ -67,10 +68,10 @@ public:
             q.pop();
 
             // visited, skip
-            if (board[cx][cy] == '#') {
+            if (board[cx][cy] == color) {
                 continue;
             }
-            board[cx][cy] = '#';
+            board[cx][cy] = color;
 
             // edge reached
             if (cx == 0 || cx == xlen - 1
@@ -92,7 +93,7 @@ public:
                 if (0 <= nx && nx < xlen
                     && 0 <= ny && ny < ylen)
                 {
-                    if (board[nx][ny] == 'O') {
+                    if (board[nx][ny] == orig_color) {
                         q.push({ nx, ny });
                     }
                 }
@@ -100,46 +101,6 @@ public:
         }
 
         return ret;
-    }
-
-    void fill(vector<vector<char>> &board, int x, int y, char color) {
-        int xlen = board.size();
-        int ylen = board[0].size();
-        char orig_color = board[x][y];
-
-        queue<pair<int, int>> q;
-        q.push({ x, y });
-
-        while (!q.empty()) {
-            auto &xy = q.front();
-            int cx = xy.first;
-            int cy = xy.second;
-            q.pop();
-
-            if (board[cx][cy] == color) {
-                continue;
-            }
-            board[cx][cy] = color;
-
-            for (const auto &neighbor : initializer_list<pair<int, int>> {
-                    { cx - 1, cy },
-                    { cx + 1, cy },
-                    { cx, cy - 1 },
-                    { cx, cy + 1 }
-                }
-            ) {
-                int nx = neighbor.first;
-                int ny = neighbor.second;
-
-                if (0 <= nx && nx < xlen
-                    && 0 <= ny && ny < ylen)
-                {
-                    if (board[nx][ny] == orig_color) {
-                        q.push({ nx, ny });
-                    }
-                }
-            }
-        }
     }
 };
 
