@@ -5,11 +5,32 @@ import re
 from pprint import pprint
 
 
-def is_hanzi(char):
-    return 19967 < ord(char) < 40870
+def is_fullwidth(char):
+    ranges = [
+        # https://en.wikipedia.org/wiki/Template:CJK_ideographs_in_Unicode
+        (0x4E00, 0x9FFF),
+        (0x3400, 0x4DBF),
+        (0x20000, 0x2A6DF),
+        (0x2A700, 0x2CEAF),
+        (0x2E80, 0x2FDF),
+        (0x2FF0, 0x303F),
+        (0x31C0, 0x31EF),
+        (0x3200, 0x33FF),
+        (0xF900, 0xFAFF),
+        (0xFE30, 0xFE4F),
+        (0x1F200, 0x1F2FF),
+        (0x2F800, 0x2FA1F),
+        # https://en.wikipedia.org/wiki/Halfwidth_and_fullwidth_forms
+        (0xFF01, 0xFF5E),
+        (0xFFE0, 0xFFE6),
+    ]
+    for l, r in ranges:
+        if l <= ord(char) <= r:
+            return True
+    else:
+        return False
 
 
-# FIXME: asdf
 def display_width(s):
     '''全角为 2 ，半角为 1 。
 
@@ -17,8 +38,12 @@ def display_width(s):
     2
     >>> display_width('啊')
     2
+    >>> all(display_width(x) == 2 for x in '，。！＠＃￥％＆（）＋｛｝【】＼｜？、；～')
+    True
+    >>> all(display_width(chr(x)) == 1 for x in range(ord('a'), ord('z') + 1))
+    True
     '''
-    return sum( 2 if is_hanzi(char) else 1 for char in s )
+    return sum( 2 if is_fullwidth(char) else 1 for char in s )
 
 
 def ljust(s, width):
