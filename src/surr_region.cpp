@@ -35,9 +35,7 @@ public:
             for (int y = 0; y < ylen; y++) {
                 if (board[x][y] == 'O') {
                     bool result = explore(board, x, y);
-                    if (!result) {
-                        fill(board, x, y, 'F');
-                    } else {
+                    if (result) {
                         fill(board, x, y, 'X');
                     }
                 }
@@ -46,7 +44,7 @@ public:
 
         for (int x = 0; x < xlen; x++) {
             for (int y = 0; y < ylen; y++) {
-                if (board[x][y] == 'F') {
+                if (board[x][y] == '#') {
                     fill(board, x, y, 'O');
                 }
             }
@@ -57,6 +55,8 @@ public:
         int xlen = board.size();
         int ylen = board[0].size();
 
+        bool ret = true;
+
         queue<pair<int, int>> q;
         q.push({ x, y });
 
@@ -66,16 +66,17 @@ public:
             int cy = xy.second;
             q.pop();
 
+            // visited, skip
             if (board[cx][cy] == '#') {
                 continue;
             }
             board[cx][cy] = '#';
 
+            // edge reached
             if (cx == 0 || cx == xlen - 1
                 || cy == 0 || cy == ylen - 1)
             {
-                // fill 'F'
-                return false;
+                ret = false;
             }
 
             for (const auto &neighbor : initializer_list<pair<int, int>> {
@@ -98,8 +99,7 @@ public:
             }
         }
 
-        // filled '#'
-        return true;
+        return ret;
     }
 
     void fill(vector<vector<char>> &board, int x, int y, char color) {
@@ -134,7 +134,7 @@ public:
                 if (0 <= nx && nx < xlen
                     && 0 <= ny && ny < ylen)
                 {
-                    if (board[nx][ny] == orig_color || board[nx][ny] == 'O') {
+                    if (board[nx][ny] == orig_color) {
                         q.push({ nx, ny });
                     }
                 }
@@ -378,6 +378,6 @@ TEST_CASE("130. Surrounded Regions") {
     };
 
     s.solve(board);
-    ;
+    // TODO: check it
 }
 #endif
