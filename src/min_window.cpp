@@ -24,7 +24,7 @@ class Solution {
 public:
     string minWindow(const string &s, const string &t) {
         int t_len = 0;
-        int t_count[256];
+        int t_count[128];
         memset(t_count, 0, sizeof(t_count));
         for (uint8_t ch : t) {
             if (t_count[ch] == 0) {
@@ -36,9 +36,9 @@ public:
             return "";
         }
 
-        int s_count[256];
+        int s_count[128];
         memset(s_count, 0, sizeof(s_count));
-        vector<bool> s_flag(256, false);
+        int s_flag_count = 0;
         int s_len = s.size();
 
         int win_len = numeric_limits<int>::max();
@@ -47,7 +47,7 @@ public:
         int start = 0;
         int end = 0;
         while (true) {
-            if (count(s_flag.begin(), s_flag.end(), true) < t_len) {
+            if (s_flag_count < t_len) {
                 end++;
                 if (end > s_len) {
                     break;
@@ -55,12 +55,12 @@ public:
                 uint8_t ch = s[end - 1];
                 if (t_count[ch]) {
                     s_count[ch]++;
-                    if (s_count[ch] >= t_count[ch]) {
-                        s_flag[ch] = true;
+                    if (s_count[ch] == t_count[ch]) {
+                        s_flag_count++;
                     }
                 }
             } else {
-                assert(count(s_flag.begin(), s_flag.end(), true) == t_len);
+                assert(s_flag_count == t_len);
                 if (end - start < win_len) {
                     win_len = end - start;
                     win_start = start;
@@ -73,8 +73,8 @@ public:
                 uint8_t ch = s[start - 1];
                 if (t_count[ch]) {
                     s_count[ch]--;
-                    if (s_count[ch] < t_count[ch]) {
-                        s_flag[ch] = false;
+                    if (s_count[ch] == t_count[ch] - 1) {
+                        s_flag_count--;
                     }
                 }
             }
