@@ -23,12 +23,15 @@ using namespace std;
 class Solution {
 public:
     string minWindow(const string &s, const string &t) {
-        bool t_set[256];
-        memset(t_set, 0, sizeof(t_set));
+        int t_len = 0;
+        int t_count[256];
+        memset(t_count, 0, sizeof(t_count));
         for (uint8_t ch : t) {
-            t_set[ch] = true;
+            if (t_count[ch] == 0) {
+                t_len++;
+            }
+            t_count[ch]++;
         }
-        int t_len = t.size();
         if (t_len == 0) {
             return "";
         }
@@ -50,11 +53,11 @@ public:
                     break;
                 }
                 uint8_t ch = s[end - 1];
-                if (t_set[ch]) {
-                    if (s_count[ch] == 0) {
+                if (t_count[ch]) {
+                    s_count[ch]++;
+                    if (s_count[ch] >= t_count[ch]) {
                         s_flag[ch] = true;
                     }
-                    s_count[ch]++;
                 }
             } else {
                 assert(count(s_flag.begin(), s_flag.end(), true) == t_len);
@@ -68,9 +71,9 @@ public:
 
                 start++;
                 uint8_t ch = s[start - 1];
-                if (t_set[ch]) {
+                if (t_count[ch]) {
                     s_count[ch]--;
-                    if (s_count[ch] == 0) {
+                    if (s_count[ch] < t_count[ch]) {
                         s_flag[ch] = false;
                     }
                 }
@@ -91,12 +94,18 @@ TEST_CASE("76. Minimum Window Substring") {
     Solution s;
 
     CHECK(s.minWindow("ADOBECODEBANC", "ABC") == "BANC");
-    CHECK(s.minWindow("asdf", "") == "");
     CHECK(s.minWindow("assssdssf", "s") == "s");
+
+    // non-unique `t`
+    CHECK(s.minWindow("aa", "aa") == "aa");
+    CHECK(s.minWindow("abcaba", "aa") == "aba");
+
+    CHECK(s.minWindow("asdf", "") == "");
+    CHECK(s.minWindow("ADOBECODEBANC", "ABCX") == "");
+
     CHECK(s.minWindow(string(10000, 'A'), "A") == "A");
     CHECK(s.minWindow(string(10000, 'A') + string(10000, 'B'), "AB") == "AB");
     string str = string("A") + string(10000, 'C') + string("B");
     CHECK(s.minWindow(str, "BA") == str);
-    CHECK(s.minWindow("ADOBECODEBANC", "ABCX") == "");
 }
 #endif
