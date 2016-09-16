@@ -78,7 +78,13 @@ public:
                         box[RIGHT] = 0;
                         box[DOWN] = 0;
                         box[UP] = x[0];
-                    } else {
+                    } else if (cur.x == 0) {
+                        outter = false;
+                        box[LEFT] = prev.x;
+                        box[RIGHT] = cur.x;
+                        box[DOWN] = cur.y;
+                        box[UP] = 0;
+                    } else {    // cur.x < 0
                         // ┌───┐
                         // │   │
                         // │
@@ -201,6 +207,7 @@ TEST_CASE("335. Self Crossing") {
 
     CHECK(s.isSelfCrossing({ 1, 1, 1, 1 }) == true);
     CHECK(s.isSelfCrossing({ 1, 2, 3, 4, 5 }) == false);
+    CHECK(s.isSelfCrossing({ 1, 1, 2, 1, 1 }) == true);
 
     CHECK(s.isSelfCrossing({}) == false);
     CHECK(s.isSelfCrossing({ 1 }) == false);
