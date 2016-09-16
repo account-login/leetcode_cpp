@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 #include <cstdint>
 #include <limits>
 #include <vector>
@@ -24,8 +23,7 @@ class Solution {
 public:
     string minWindow(const string &s, const string &t) {
         int t_len = 0;
-        int t_count[128];
-        memset(t_count, 0, sizeof(t_count));
+        int t_count[128] = {};
         for (uint8_t ch : t) {
             if (t_count[ch] == 0) {
                 t_len++;
@@ -36,8 +34,7 @@ public:
             return "";
         }
 
-        int s_count[128];
-        memset(s_count, 0, sizeof(s_count));
+        int s_count[128] = {};
         int s_flag_count = 0;
         int s_len = s.size();
 
