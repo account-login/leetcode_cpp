@@ -59,4 +59,5 @@ Solutions for leetcode using c++11.
 | [335. Self Crossing](<https://leetcode.com/problems/self-crossing/>)                                                        | [self_cross](<src/self_cross.cpp>)         | 0ms  |       |
 | [165. Compare Version Numbers](<https://leetcode.com/problems/compare-version-numbers/>)                                    | [version_cmp](<src/version_cmp.cpp>)       | 0ms  |       |
 | [307. Range Sum Query - Mutable](<https://leetcode.com/problems/range-sum-query-mutable/>)                                  | [range_sum_mut](<src/range_sum_mut.cpp>)   | 52ms |       |
+| [179. Largest Number](<https://leetcode.com/problems/largest-number/>)                                                      | [largest_num](<src/largest_num.cpp>)       |      |       |
 
