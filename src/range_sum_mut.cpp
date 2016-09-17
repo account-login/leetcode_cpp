@@ -84,6 +84,10 @@ public:
 
     int sumRange(int i, int j) const {
         j++;
+        // extend right boundary to leverage higher node.
+        if (j == nums_len) {
+            j = 1 << height;
+        }
         return sum(i, j, 0, 1 << height, 0);
     }
 
