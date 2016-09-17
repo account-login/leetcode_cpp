@@ -50,6 +50,7 @@ public:
             } else if (end - begin == len) {
                 return;
             } else {
+                // change direction to avoid overlap, which swap_ranges() is undefined on that case.
                 len = end - begin - len;
                 right_dir = !right_dir;
             }
