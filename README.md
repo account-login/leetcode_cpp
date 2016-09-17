@@ -62,4 +62,5 @@ Solutions for leetcode using c++11.
 | [179. Largest Number](<https://leetcode.com/problems/largest-number/>)                                                         | [largest_num](<src/largest_num.cpp>)       | 3ms  |       |
 | [211. Add and Search Word - Data structure design](<https://leetcode.com/problems/add-and-search-word-data-structure-design/>) | [add_n_search](<src/add_n_search.cpp>)     | 69ms |       |
 | [98. Validate Binary Search Tree](<https://leetcode.com/problems/validate-binary-search-tree/>)                                | [valid_bst](<src/valid_bst.cpp>)           | 19ms |       |
+| [189. Rotate Array](<https://leetcode.com/problems/rotate-array/>)                                                             | [rotate_array](<src/rotate_array.cpp>)     | 26ms |       |
 
