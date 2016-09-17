@@ -63,4 +63,5 @@ Solutions for leetcode using c++11.
 | [211. Add and Search Word - Data structure design](<https://leetcode.com/problems/add-and-search-word-data-structure-design/>) | [add_n_search](<src/add_n_search.cpp>)     | 69ms |       |
 | [98. Validate Binary Search Tree](<https://leetcode.com/problems/validate-binary-search-tree/>)                                | [valid_bst](<src/valid_bst.cpp>)           | 19ms |       |
 | [189. Rotate Array](<https://leetcode.com/problems/rotate-array/>)                                                             | [rotate_array](<src/rotate_array.cpp>)     | 26ms |       |
+| [32. Longest Valid Parentheses](<https://leetcode.com/problems/longest-valid-parentheses/>)                                    | [longest_par](<src/longest_par.cpp>)       |      |       |
 
