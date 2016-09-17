@@ -1,3 +1,4 @@
+#include <vector>
 #include <iostream>
 
 #ifdef RUN_TEST
@@ -81,12 +82,12 @@ public:
         }
     }
 
-    int sumRange(int i, int j) {
+    int sumRange(int i, int j) const {
         j++;
         return sum(i, j, 0, 1 << height, 0);
     }
 
-    int sum(int x, int y, int begin, int end, int index) {
+    int sum(int x, int y, int begin, int end, int index) const {
         assert(begin <= x && y <= end);
 
         if (x == begin && y == end) {
