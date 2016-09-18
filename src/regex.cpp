@@ -27,6 +27,11 @@ public:
             return str[0] == '\0';
         }
 
+        // optimization, not necessary.
+        if (str[0] == '\0') {
+            return is_match_empty(pattern);
+        }
+
         int si = 0;
         int pi = 0;
 
@@ -47,7 +52,7 @@ public:
                 char pch = pattern[pi];
                 pi += 2;
 
-                if (isMatch(str + si, &pattern[pi])) {
+                if (isMatch(&str[si], &pattern[pi])) {
                     return true;
                 }
 
@@ -67,6 +72,17 @@ public:
 
     static inline bool char_eq(char c, char p) {
         return c != '\0' && (p == '.' || c == p);
+    }
+
+    static inline bool is_match_empty(const char *pattern) {
+        while (*pattern != '\0') {
+            if (pattern[1] != '*') {
+                return false;
+            }
+            pattern += 2;
+        }
+
+        return true;
     }
 };
 
