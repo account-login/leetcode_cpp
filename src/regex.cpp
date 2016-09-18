@@ -22,6 +22,7 @@ public:
     }
 
     static bool isMatch(const char *str, const char *pattern) {
+        // pattern ended
         if (pattern[0] == '\0') {
             return str[0] == '\0';
         }
@@ -31,14 +32,16 @@ public:
 
         while (true) {
             if (pattern[pi + 1] != '*') {
+                // str[si] == '\0' exited here
                 if (!char_eq(str[si], pattern[pi])) {
                     return false;
                 }
 
                 si++;
                 pi++;
-                if (str[si] == '\0' || pattern[pi] == '\0') {
-                    return str[si] == '\0' && pattern[pi] == '\0';
+                // pattern ended
+                if (pattern[pi] == '\0') {
+                    return str[si] == '\0';
                 }
             } else {
                 char pch = pattern[pi];
@@ -48,11 +51,9 @@ public:
                     return true;
                 }
 
+                // str[si] == '\0' exited here
                 while (char_eq(str[si], pch)) {
                     si++;
-                    if (str[si] == '\0') {
-                        return pattern[pi] == '\0';
-                    }
 
                     if (isMatch(&str[si], &pattern[pi])) {
                         return true;
@@ -65,7 +66,7 @@ public:
     }
 
     static inline bool char_eq(char c, char p) {
-        return p == '.' || c == p;
+        return c != '\0' && (p == '.' || c == p);
     }
 };
 
@@ -92,5 +93,11 @@ TEST_CASE("10. Regular Expression Matching") {
     CHECK(s.isMatch("", p) == true);
     CHECK(s.isMatch("abc", p) == false);
     CHECK(s.isMatch("", "a") == false);
+
+    CHECK(s.isMatch("a", "ab*") == true);
+    CHECK(s.isMatch("", "b*") == true);
+    CHECK(s.isMatch("", "b*a") == false);
+
+    CHECK(s.isMatch("", ".") == false);
 }
 #endif
