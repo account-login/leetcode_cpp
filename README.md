@@ -65,6 +65,6 @@ Solutions for leetcode using c++11.
 | [189. Rotate Array](<https://leetcode.com/problems/rotate-array/>)                                                             | [rotate_array](<src/rotate_array.cpp>)           | 26ms |       |
 | [32. Longest Valid Parentheses](<https://leetcode.com/problems/longest-valid-parentheses/>)                                    | [longest_par](<src/longest_par.cpp>)             | 12ms |       |
 | [304. Range Sum Query 2D - Immutable](<https://leetcode.com/problems/range-sum-query-2d-immutable/>)                           | [range_sum_2d_immu](<src/range_sum_2d_immu.cpp>) | 23ms |       |
-| [10. Regular Expression Matching](<https://leetcode.com/problems/regular-expression-matching/>)                                | [regex](<src/regex.cpp>)                         |      |       |
+| [10. Regular Expression Matching](<https://leetcode.com/problems/regular-expression-matching/>)                                | [regex](<src/regex.cpp>)                         | 46ms |       |
 | [390. Elimination Game](<https://leetcode.com/problems/elimination-game/>)                                                     | [elim_game](<src/elim_game.cpp>)                 | 29ms |       |
 
