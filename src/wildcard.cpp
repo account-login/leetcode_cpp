@@ -130,15 +130,19 @@ public:
 
     int find_word_sunday(const char *str, const char *pattern) {
         int pattern_len = 0;
-        int last_qm = -1;
         while (pattern[pattern_len] != '*' && pattern[pattern_len] != '\0') {
-            if (pattern[pattern_len] == '?') {
-                last_qm = pattern_len;
-            }
             pattern_len++;
         }
-        if (last_qm == pattern_len - 1) {
-            return find_word_naive(str, pattern);
+
+        int trailing_qm_count = 0;
+        while (pattern[pattern_len - 1] == '?') {
+            trailing_qm_count++;
+            pattern_len--;
+        }
+
+        int last_qm = pattern_len - 1;
+        while (last_qm >= 0 && pattern[last_qm] != '?') {
+            last_qm--;
         }
 
         int str_len = strlen(str);
@@ -167,29 +171,27 @@ public:
         int si = 0;
         int pi = 0;
         while (true) {
-            if (pi == pattern_len) {
-                return si;
-            } else if (str[si] == '\0') {
+            int end = si - pi + pattern_len - 1;
+            if (end + trailing_qm_count >= str_len) {
                 return -1;
             }
 
-            int end = si - pi + pattern_len - 1;
-            if (end < str_len) {
-                if (pattern[pattern_len - 1] != str[end]) {
-                    uint8_t last_ch = str[end];
-                    si += jmp[last_ch];
-                } else {
-                    if (char_match(str[si], pattern[pi])) {
-                        si++;
-                        pi++;
-                    } else {
-                        si -= pi;
-                        si++;
-                        pi = 0;
-                    }
-                }
+            if (pi == pattern_len) {
+                return si + trailing_qm_count;
+            }
+
+            if (pattern[pattern_len - 1] != str[end]) {
+                uint8_t last_ch = str[end];
+                si += jmp[last_ch];
             } else {
-                return -1;
+                if (char_match(str[si], pattern[pi])) {
+                    si++;
+                    pi++;
+                } else {
+                    si -= pi;
+                    si++;
+                    pi = 0;
+                }
             }
         }
     }
@@ -221,6 +223,12 @@ TEST_CASE("44. Wildcard Matching") {
 
     CHECK(s.isMatch("b", "?*?") == false);
     CHECK(s.isMatch("b", "*?*?*") == false);
+
+    CHECK(s.isMatch("XasdfX", "X*????*X") == true);
+    CHECK(s.isMatch("XasdfasdfasdfasdfX", "X*asdfa???asd?????*X") == true);
+    CHECK(s.isMatch("XasdfX", "X*a????*X") == false);
+    CHECK(s.isMatch("XasdfX", "X*???f*X") == true);
+    CHECK(s.isMatch("XasdfX", "X*???f?*X") == false);
 
     CHECK(s.isMatch("xcacabbbcabaacbacbacbccbcbbbccbabbbabbaaacccbcacbbbcacccaacbccabbaacbbcabbbcccaccacbababbccccbbabaccccbcacacabcccbacaacabcbbaaacbacacaaacacbaaacaababbbbcbaccabbcaccacbacacaabccacx",
                     "x*cbc?bbcc*x") == true);
