@@ -1,5 +1,6 @@
-#include <iostream>
 #include <string>
+#include <random>
+#include <iostream>
 
 #ifdef RUN_TEST
 #   define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
@@ -125,52 +126,6 @@ public:
     }
 
     /**
-     * @brief memcmp() that ignore '?' on both buffer. Used by KMP algorithm.
-     * @param buf1
-     * @param buf2
-     * @param size
-     * @return return weither \a buf1 equals \a buf2.
-     */
-    bool memcmp_qm(const char *buf1, const char *buf2, size_t size) {
-        for (size_t i = 0; i < size; i++) {
-            if (buf1[i] == '?' || buf2[i] == '?') {
-                continue;
-            }
-            if (buf1[i] != buf2[i]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @brief Find out the longest prefix of \a str that matches the prefix of \a pattern.
-     * @param str
-     * @param pattern
-     * @param start   skip first n characters of \a str. Used by KMP algorithm.
-     * @return return the length of matched prefix.
-     *         return a negative number on fail.
-     */
-    int match_partial(const char *str, const char *pattern, int start = 0) {
-        for (int ret = start; ; ret++) {
-            if (pattern[ret] == '*' || pattern[ret] == '\0') {
-                return ret;
-            }
-            if (str[ret] == '\0') {
-                return -1;
-            }
-
-            if (pattern[ret] == '?') {
-                continue;
-            }
-            if (pattern[ret] != str[ret]) {
-                return ret;
-            }
-        }
-    }
-
-    /**
      * @brief search the first word of \a pattern in \a str using KMP algorithm.
      * @param str
      * @param pattern
@@ -183,43 +138,58 @@ public:
             pattern_len++;
         }
 
-        // TODO: optimize this
-        int jmp_table[pattern_len];
-        for (int i = 0; i < pattern_len; i++) {
-            jmp_table[i] = 1;
-            for (int j = 1; j <= i; j++) {
-                int size = i - j;
-                if (memcmp_qm(pattern + j, pattern, size)) {
-                    jmp_table[i] = j;
-                    break;
+        // vector<int> next(pattern_len);
+        int next[pattern_len];
+        next[0] = 0;
+        if (pattern_len > 1) {
+            next[1] = 0;
+            for (int i = 2; i < pattern_len; i++) {
+                next[i] = next[i - 1] + 1;
+                while (!char_match_bi(pattern[next[i] - 1], pattern[i - 1])) {
+                    if (next[i] == 1) {
+                        next[i] = 0;
+                        break;
+                    } else {
+                        next[i] = next[next[i] - 1] + 1;
+                    }
+                }
+                assert(next[i] < i);
+            }
+        }
+
+        int si = 0;
+        int pi = 0;
+        while (true) {
+            if (str[si] == '\0') {
+                if (pi == pattern_len) {
+                    return si;
+                } else {
+                    return -1;
+                }
+            }
+            if (pi == pattern_len) {
+                return si;
+            }
+
+            if (char_match(str[si], pattern[pi])) {
+                si++;
+                pi++;
+            } else {
+                if (pi == 0) {
+                    si++;
+                } else {
+                    pi = next[pi];
                 }
             }
         }
+    }
 
-        const char *origin_str = str;
-        int start = 0;
-        while (true) {
-            int prefix_len = match_partial(str, pattern, start);
-            if (prefix_len < 0) {
-                return -1;
-            }
+    static inline bool char_match(char c, char p) {
+        return p == '?' || c == p;
+    }
 
-            // the whole word matched, success.
-            if (prefix_len == pattern_len) {
-                return str - origin_str + pattern_len;
-            }
-
-            // go to the next posible matched position
-            int jmp = jmp_table[prefix_len];
-            str += jmp;
-
-            // skip matched prefix
-            if (prefix_len > 0) {
-                start = prefix_len - jmp;
-            } else {
-                start = 0;
-            }
-        }
+    static inline bool char_match_bi(char p1, char p2) {
+        return (p1 == '?' || p2 == '?') || p1 == p2;
     }
 };
 
@@ -240,9 +210,42 @@ TEST_CASE("44. Wildcard Matching") {
     CHECK(s.isMatch("asdf", "as*sf") == false);
     CHECK(s.isMatch("asdf", "as*d") == false);
     CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*sdfasdfasdf*asdf") == true);
+    CHECK(s.isMatch("asdfasdfxasdfasdfxasdfasdfxasdfasdfxasdfasdf", "asdfa*sd*sdfasdfasdf*asdf") == false);
     CHECK(s.isMatch("asdfasdfasdfasdfasdfasdfasdfasdf", "asdfa*sd*dasdfaXsdf*asdf") == false);
 
     CHECK(s.isMatch("b", "?*?") == false);
     CHECK(s.isMatch("b", "*?*?*") == false);
+
+    random_device rd;
+    uniform_int_distribution<int> random_char('a', 'c');
+    uniform_int_distribution<int> pattern_len_gen(1, 15);
+
+    for (int i = 0; i < 1000; i++) {
+        int pattern_len = pattern_len_gen(rd);
+        uniform_int_distribution<int> str_len_gen(pattern_len, pattern_len + 300);
+
+        string pattern_mid = "";    // random
+        for (int _ = 0; _ < pattern_len; _++) {
+            pattern_mid.push_back(random_char(rd));
+        }
+        string pattern = "x*" + pattern_mid + "*x";
+
+        for (int j = 0; j < 100; j++) {
+            CAPTURE(i);
+            CAPTURE(j);
+            int str_len = str_len_gen(rd);
+
+            string str_mid = "";    // random
+            for (int _ = 0; _ < str_len; _++) {
+                str_mid.push_back(random_char(rd));
+            }
+            string str = "x" + str_mid + "x";
+
+            CAPTURE(str);
+            CAPTURE(pattern);
+            bool ans = str_mid.find(pattern_mid) != string::npos;
+            CHECK(s.isMatch(str, pattern) == ans);
+        }
+    }
 }
 #endif
