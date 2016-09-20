@@ -154,14 +154,15 @@ public:
             max_jmp = pattern_len;
         }
 
-        int jmp[256] = {};
+        int jmp[128] = {};
         // last char not found, jump to last question mark or end of pattern
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 128; i++) {
             jmp[i] = max_jmp;
         }
         // jump to last matching char
         for (int i = 0; i < pattern_len - 1; i++) {
             uint8_t ch = pattern[i];
+            assert(ch < 128);
             int jmp_val = pattern_len - i - 1;
             if (jmp_val < max_jmp) {
                 jmp[ch] = jmp_val;
@@ -182,6 +183,7 @@ public:
 
             if (pattern[pattern_len - 1] != str[end]) {
                 uint8_t last_ch = str[end];
+                assert(last_ch < 128);
                 si += jmp[last_ch];
             } else {
                 if (char_match(str[si], pattern[pi])) {
