@@ -1,10 +1,13 @@
 #include <string>
+#include <cstdint>
+#include <cstring>
 #include <random>
 #include <iostream>
 
 #ifdef RUN_TEST
 #   define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #   include "catch.hpp"
+#   include "fnmatch.h"
 #else
 #   define NDEBUG   // remove assert() call
 #endif
@@ -65,7 +68,7 @@ public:
                 }
             } else {
                 // match middle word
-                jmp = this->find_word_kmp(str, pattern);
+                jmp = this->find_word_sunday(str, pattern);
                 if (jmp < 0) {
                     return false;
                 } else {
@@ -125,71 +128,74 @@ public:
         return -1;
     }
 
-    /**
-     * @brief search the first word of \a pattern in \a str using KMP algorithm.
-     * @param str
-     * @param pattern
-     * @return return the offset from \a str to the end of matched word on success,
-     *         return a negative number on fail.
-     */
-    int find_word_kmp(const char *str, const char *pattern) {
+    int find_word_sunday(const char *str, const char *pattern) {
         int pattern_len = 0;
+        int last_qm = -1;
         while (pattern[pattern_len] != '*' && pattern[pattern_len] != '\0') {
+            if (pattern[pattern_len] == '?') {
+                last_qm = pattern_len;
+            }
             pattern_len++;
         }
+        if (last_qm == pattern_len - 1) {
+            return find_word_naive(str, pattern);
+        }
 
-        // vector<int> next(pattern_len);
-        int next[pattern_len];
-        next[0] = 0;
-        if (pattern_len > 1) {
-            next[1] = 0;
-            for (int i = 2; i < pattern_len; i++) {
-                next[i] = next[i - 1] + 1;
-                while (!char_match_bi(pattern[next[i] - 1], pattern[i - 1])) {
-                    if (next[i] == 1) {
-                        next[i] = 0;
-                        break;
-                    } else {
-                        next[i] = next[next[i] - 1] + 1;
-                    }
-                }
-                assert(next[i] < i);
+        int str_len = strlen(str);
+
+        int max_jmp;
+        if (last_qm >= 0) {
+            max_jmp = pattern_len - last_qm - 1;
+        } else {
+            max_jmp = pattern_len;
+        }
+
+        int jmp[256] = {};
+        // last char not found, jump to last question mark or end of pattern
+        for (int i = 0; i < 256; i++) {
+            jmp[i] = max_jmp;
+        }
+        // jump to last matching char
+        for (int i = 0; i < pattern_len - 1; i++) {
+            uint8_t ch = pattern[i];
+            int jmp_val = pattern_len - i - 1;
+            if (jmp_val < max_jmp) {
+                jmp[ch] = jmp_val;
             }
         }
 
         int si = 0;
         int pi = 0;
         while (true) {
-            if (str[si] == '\0') {
-                if (pi == pattern_len) {
-                    return si;
-                } else {
-                    return -1;
-                }
-            }
             if (pi == pattern_len) {
                 return si;
+            } else if (str[si] == '\0') {
+                return -1;
             }
 
-            if (char_match(str[si], pattern[pi])) {
-                si++;
-                pi++;
-            } else {
-                if (pi == 0) {
-                    si++;
+            int end = si - pi + pattern_len - 1;
+            if (end < str_len) {
+                if (pattern[pattern_len - 1] != str[end]) {
+                    uint8_t last_ch = str[end];
+                    si += jmp[last_ch];
                 } else {
-                    pi = next[pi];
+                    if (char_match(str[si], pattern[pi])) {
+                        si++;
+                        pi++;
+                    } else {
+                        si -= pi;
+                        si++;
+                        pi = 0;
+                    }
                 }
+            } else {
+                return -1;
             }
         }
     }
 
     static inline bool char_match(char c, char p) {
         return p == '?' || c == p;
-    }
-
-    static inline bool char_match_bi(char p1, char p2) {
-        return (p1 == '?' || p2 == '?') || p1 == p2;
     }
 };
 
@@ -216,8 +222,14 @@ TEST_CASE("44. Wildcard Matching") {
     CHECK(s.isMatch("b", "?*?") == false);
     CHECK(s.isMatch("b", "*?*?*") == false);
 
+    CHECK(s.isMatch("xcacabbbcabaacbacbacbccbcbbbccbabbbabbaaacccbcacbbbcacccaacbccabbaacbbcabbbcccaccacbababbccccbbabaccccbcacacabcccbacaacabcbbaaacbacacaaacacbaaacaababbbbcbaccabbcaccacbacacaabccacx",
+                    "x*cbc?bbcc*x") == true);
+    CHECK(s.isMatch("xabaaaababbbcbcbbccabbbacabaaabaccabbcbbccccaaabccbbacccbaccacaaaccaccccaabcbbbbccabbacabbbbbbabacbccccccabacccacbababccaccaababbaacabbabababacabcaccacabcccbaacbabbcacccabbaccacaacbaaabcbccbcabacbccbcabcbacbx",
+                    "x*cbc?bcb??*x") == true);
+
     random_device rd;
-    uniform_int_distribution<int> random_char('a', 'c');
+    char random_chars[] = { 'a', 'b', 'c', '?' };
+    uniform_int_distribution<int> random_int(0, 255);
     uniform_int_distribution<int> pattern_len_gen(1, 15);
 
     for (int i = 0; i < 1000; i++) {
@@ -226,7 +238,8 @@ TEST_CASE("44. Wildcard Matching") {
 
         string pattern_mid = "";    // random
         for (int _ = 0; _ < pattern_len; _++) {
-            pattern_mid.push_back(random_char(rd));
+            char ch = random_chars[random_int(rd) % 4];
+            pattern_mid.push_back(ch);
         }
         string pattern = "x*" + pattern_mid + "*x";
 
@@ -237,13 +250,14 @@ TEST_CASE("44. Wildcard Matching") {
 
             string str_mid = "";    // random
             for (int _ = 0; _ < str_len; _++) {
-                str_mid.push_back(random_char(rd));
+                char ch = random_chars[random_int(rd) % 3];
+                str_mid.push_back(ch);
             }
             string str = "x" + str_mid + "x";
 
             CAPTURE(str);
             CAPTURE(pattern);
-            bool ans = str_mid.find(pattern_mid) != string::npos;
+            bool ans = fnmatch(pattern.data(), str.data(), FNM_NOESCAPE) == 0;
             CHECK(s.isMatch(str, pattern) == ans);
         }
     }

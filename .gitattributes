@@ -1,1 +1,2 @@
 src/catch.hpp linguist-vendored
+src/fnmatch.h linguist-vendored
