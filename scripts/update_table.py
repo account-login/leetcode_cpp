@@ -61,6 +61,21 @@ def ljust(s, width):
     return s + ' ' * (width - display_width(s))
 
 
+def rjust(s, width):
+    '''补齐宽度到 width ，右对齐。
+
+    >>> rjust('asdf', 3)
+    'asdf'
+    >>> rjust('asdf', 5)
+    ' asdf'
+    >>> rjust('啊sdf', 5)
+    '啊sdf'
+    >>> rjust('啊sdf', 6)
+    ' 啊sdf'
+    '''
+    return ' ' * (width - display_width(s)) + s
+
+
 def read_leetcodes():
     '''parse leetcodes from Makefile'''
     leetcodes = []
@@ -112,8 +127,8 @@ def make_table(leetcodes):
                 res = re.match('\s*TEST_CASE\(\s*"([^"]+)"\s*\).*', line)
                 if res:
                     title = res.group(1)
-        assert(url)
-        assert(title)
+        assert url
+        assert title
         #     [ 'Problem', 'Answer', 'Time', 'Beats' ]
         row = [ '[{title}](<{url}>)'.format_map(vars()), '[{code}](<{src}>)'.format_map(vars()), '', '' ]
         table.append(row)
@@ -143,7 +158,7 @@ def read_table_lines():
                 else:
                     end_no = line_no
                     break
-        assert(start_no)
+        assert start_no
         if end_no is None:
             end_no = line_no + 1
 
@@ -158,7 +173,7 @@ def parse_table(lines):
             continue
 
         line = line.strip()
-        assert(line[0] == '|' and line[-1] == '|')
+        assert line[0] == '|' and line[-1] == '|'
         row = [ x.strip() for x in line.split('|') ][1:-1]
         table.append(row)
 
@@ -166,16 +181,23 @@ def parse_table(lines):
 
 
 def update_table(new, orig):
-    assert(len(new) >= len(orig))
+    assert len(new) >= len(orig)
     for idx in range(len(orig)):
-        assert(new[idx][1] == orig[idx][1])     # answer source link
+        assert new[idx][1] == orig[idx][1]      # answer source link
         new[idx] = new[idx][:2] + orig[idx][2:]
         #          ^ prob & ans   ^ time & beats
     return new
 
 
-def format_table(table):
-    assert(len(table) > 0)
+def format_table(table, justification=None):
+    assert len(table) > 0
+    
+    ncol = len(table[0])
+    if justification is None:
+        just_func = [ ljust ] * ncol
+    else:
+        assert ncol == len(justification)
+        just_func = [ { 'L': ljust, 'R': rjust }[x] for x in justification ]
 
     def max_col_width(i):
         return max(display_width(row[i]) for row in table)
@@ -184,7 +206,7 @@ def format_table(table):
 
     lines = []
     for row_no, row in enumerate(table):
-        cells = [ ljust(row[i], col_width[i]) for i in range(len(row)) ]
+        cells = [ just_func[col_no](row[col_no], col_width[col_no]) for col_no in range(len(row)) ]
         line = '| {} |'.format(' | '.join(cells))
         lines.append(line)
 
@@ -220,7 +242,7 @@ def main():
     origin_table = parse_table(origin_table_lines)
 
     table = update_table(table, origin_table)
-    lines = format_table(table)
+    lines = format_table(table, 'LLRR')
     update_table_lines(lines, start_no, end_no)
 
 
