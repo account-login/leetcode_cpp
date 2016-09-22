@@ -26,7 +26,7 @@ public:
         vector<char> prefix_match(s_len + 1, false);
         prefix_match[0] = true;
 
-        for (int pi = 0, start = 0; ; pi++) {
+        for (int pi = 0, start = 0, end = s_len + 1; ; pi++) {
             if (pattern[pi] == '\0') {
                 if (prefix_match[s_len]) {
                     return true;
@@ -38,9 +38,10 @@ public:
             bool no_sol = true;
             char ch = pattern[pi];
             if (ch == '*') {
-                for (int i = start; i < s_len + 1; i++) {
+                for (int i = start; i < end; i++) {
                     if (prefix_match[i]) {
                         no_sol = false;
+                        end = s_len + 1;
                         for (int j = i + 1; j < s_len + 1; j++) {
                             prefix_match[j] = true;
                         }
@@ -48,8 +49,9 @@ public:
                     }
                 }
             } else {
+                int new_end;
                 bool ahead = prefix_match[start];
-                for (int i = start; i < s_len; i++) {
+                for (int i = start; i < min(end, s_len); i++) {
                     bool cur = ahead;
                     ahead = prefix_match[i + 1];
 
@@ -59,10 +61,13 @@ public:
                         }
                         no_sol = false;
                         prefix_match[i + 1] = true;
+                        new_end = i + 2;
+                        assert(new_end <= s_len + 1);
                     } else {
                         prefix_match[i + 1] = false;
                     }
                 }
+                end = new_end;
             }
 
             if (no_sol) {
