@@ -23,15 +23,12 @@ public:
     bool isMatch(const string &str, const string &pattern) {
         int s_len = str.size();
         // vector<char> is faster than vector<bool>
-        /// \todo use only one array instead of two
-        vector<char> dp1(s_len + 1, false);
-        vector<char> dp2(s_len + 1, false);
-        dp2[0] = true;
+        vector<char> prefix_match(s_len + 1, false);
+        prefix_match[0] = true;
 
-        int pi = 0;
-        while (true) {
+        for (int pi = 0; ; pi++) {
             if (pattern[pi] == '\0') {
-                if (dp2[s_len]) {
+                if (prefix_match[s_len]) {
                     return true;
                 } else {
                     return false;
@@ -42,24 +39,26 @@ public:
             char ch = pattern[pi];
             if (ch == '*') {
                 for (int i = 0; i < s_len + 1; i++) {
-                    if (dp2[i]) {
+                    if (prefix_match[i]) {
                         no_sol = false;
-                        for (int j = i; j < s_len + 1; j++) {
-                            dp1[j] = true;
+                        for (int j = i + 1; j < s_len + 1; j++) {
+                            prefix_match[j] = true;
                         }
                         break;
-                    } else {
-                        dp1[i] = false;
                     }
                 }
             } else {
-                dp1[0] = false;
+                bool ahead = prefix_match[0];
+                prefix_match[0] = false;
                 for (int i = 0; i < s_len; i++) {
-                    if (dp2[i] && (str[i] == ch || ch == '?')) {
+                    bool cur = ahead;
+                    ahead = prefix_match[i + 1];
+
+                    if (cur && (str[i] == ch || ch == '?')) {
                         no_sol = false;
-                        dp1[i + 1] = true;
+                        prefix_match[i + 1] = true;
                     } else {
-                        dp1[i + 1] = false;
+                        prefix_match[i + 1] = false;
                     }
                 }
             }
@@ -67,9 +66,6 @@ public:
             if (no_sol) {
                 return false;
             }
-
-            pi++;
-            swap(dp1, dp2);
         }
     }
 };
