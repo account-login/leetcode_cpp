@@ -68,5 +68,5 @@ Solutions for leetcode using c++11.
 | [10. Regular Expression Matching](<https://leetcode.com/problems/regular-expression-matching/>)                                | [regex](<src/regex.cpp>)                         |  36ms |   43% |
 | [390. Elimination Game](<https://leetcode.com/problems/elimination-game/>)                                                     | [elim_game](<src/elim_game.cpp>)                 |  29ms |   62% |
 | [44. Wildcard Matching](<https://leetcode.com/problems/wildcard-matching/>)                                                    | [wildcard_dp](<src/wildcard_dp.cpp>)             | 119ms |   48% |
-| [402. Remove K Digits](<https://leetcode.com/problems/remove-k-digits/>)                                                       | [remove_k](<src/remove_k.cpp>)                   |       |       |
+| [402. Remove K Digits](<https://leetcode.com/problems/remove-k-digits/>)                                                       | [remove_k](<src/remove_k.cpp>)                   |   6ms |   56% |
 
