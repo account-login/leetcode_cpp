@@ -9,7 +9,8 @@ LEETCODES = perm_seq word_ladder_ii max_points lru_cache div_int frac2dec \
             word_break_ii perf_rect text_just short_palin substr_cat dungeon \
             3sum surr_region min_window self_cross version_cmp range_sum_mut \
             largest_num add_n_search valid_bst rotate_array longest_par \
-            range_sum_2d_immu regex elim_game wildcard_dp remove_k 4sum parser
+            range_sum_2d_immu regex elim_game wildcard_dp remove_k 4sum parser \
+            contain_dup_iii
 
 all: $(LEETCODES)
 
