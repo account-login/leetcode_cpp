@@ -108,5 +108,13 @@ TEST_CASE("385. Mini Parser") {
 
     ni = s.deserialize("[[],[[]]]");
     CHECK(ni.getList()[1].getList()[0].getList().size() == 0);
+
+    int N = 5000;
+    ni = s.deserialize(string(N, '[') + string(N, ']'));
+    auto lst = &ni.getList();
+    for (int i = 0; i < N - 1; i++) {
+        lst = &(*lst)[0].getList();
+    }
+    CHECK(lst->size() == 0);
 }
 #endif
