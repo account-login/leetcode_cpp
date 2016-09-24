@@ -69,4 +69,5 @@ Solutions for leetcode using c++11.
 | [390. Elimination Game](<https://leetcode.com/problems/elimination-game/>)                                                     | [elim_game](<src/elim_game.cpp>)                 |  29ms |   62% |
 | [44. Wildcard Matching](<https://leetcode.com/problems/wildcard-matching/>)                                                    | [wildcard_dp](<src/wildcard_dp.cpp>)             | 119ms |   48% |
 | [402. Remove K Digits](<https://leetcode.com/problems/remove-k-digits/>)                                                       | [remove_k](<src/remove_k.cpp>)                   |   6ms |   56% |
+| [18. 4Sum](<https://leetcode.com/problems/4sum/>)                                                                              | [4sum](<src/4sum.cpp>)                           |  16ms |   86% |
 
