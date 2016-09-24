@@ -27,6 +27,9 @@ public:
         if (val_lim < 0) {
             return false;
         }
+        if (dist_lim <= 0) {
+            return false;
+        }
 
         vector<int> indexes;
         for (int i = 0; i < nums.size(); i++) {

@@ -71,5 +71,5 @@ Solutions for leetcode using c++11.
 | [402. Remove K Digits](<https://leetcode.com/problems/remove-k-digits/>)                                                       | [remove_k](<src/remove_k.cpp>)                   |   6ms |   56% |
 | [18. 4Sum](<https://leetcode.com/problems/4sum/>)                                                                              | [4sum](<src/4sum.cpp>)                           |  16ms |   86% |
 | [385. Mini Parser](<https://leetcode.com/problems/mini-parser/>)                                                               | [parser](<src/parser.cpp>)                       |  22ms |   99% |
-| [220. Contains Duplicate III](<https://leetcode.com/problems/contains-duplicate-iii/>)                                         | [contain_dup_iii](<src/contain_dup_iii.cpp>)     |  23ms |   88% |
+| [220. Contains Duplicate III](<https://leetcode.com/problems/contains-duplicate-iii/>)                                         | [contain_dup_iii](<src/contain_dup_iii.cpp>)     |  19ms |   92% |
 
