@@ -14,11 +14,10 @@
 #endif
 #include <cassert>
 
-// select implementation
-#define ALGO sort
+// select an implementation
+#define ALGO sort       // sort tree naive
 #define __SUFFIX(a, b) a##b
 #define _SUFFIX(a, b) __SUFFIX(a, b)
-#define containsNearbyAlmostDuplicate _SUFFIX(containsNearbyAlmostDuplicate_, ALGO)
 
 
 // https://leetcode.com/problems/contains-duplicate-iii/
@@ -29,6 +28,10 @@ using namespace std;
 
 class Solution {
 public:
+    bool containsNearbyAlmostDuplicate(const vector<int> &nums, int dist_lim, int val_lim) {
+        return _SUFFIX(containsNearbyAlmostDuplicate_, ALGO)(nums, dist_lim, val_lim);
+    }
+
     bool containsNearbyAlmostDuplicate_sort(const vector<int> &nums, int dist_lim, int val_lim) {
         assert(dist_lim >= 0);
         if (val_lim < 0) {
