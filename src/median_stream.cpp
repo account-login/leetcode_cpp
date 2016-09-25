@@ -1,7 +1,6 @@
 #include <map>
 #include <algorithm>
 #include <utility>
-#include <type_traits>
 #include <functional>
 #include <iostream>
 
@@ -13,13 +12,13 @@
 #endif
 #include <cassert>
 
-// select an implementation
+// select an implementation (define ALGO_heap or ALGO_map)
 #ifdef ALGO_heap
 #   define ALGO heap
 #elif defined(ALGO_map)
 #   define ALGO map
 #else
-#   define ALGO_heap 1
+#   define ALGO_heap
 #   define ALGO heap
 #endif
 
@@ -227,19 +226,6 @@ TEST_CASE("295. Find Median from Data Stream") {
     CHECK(mf.pos == 0);
     CHECK(mf.findMedian() == Approx(7));
 
-    mf = MedianFinder();
-    int N = 100000;
-    for (int i = 0; i < N; i++) {
-        mf.addNum(i);
-    }
-    CHECK(mf.findMedian() == Approx((double)N / 2 - 0.5));
-
-    mf = MedianFinder();
-    for (int i = 0; i < N; i++) {
-        mf.addNum(888);
-    }
-    CHECK(mf.findMedian() == Approx(888));
-
 #   elif defined(ALGO_heap)
     auto mf = MedianFinder_heap();
     mf.addNum(5);
@@ -265,5 +251,19 @@ TEST_CASE("295. Find Median from Data Stream") {
 #   else
     assert(0);
 #   endif
+
+    // common test
+    mf = MedianFinder();
+    int N = 100000;
+    for (int i = 0; i < N; i++) {
+        mf.addNum(i);
+    }
+    CHECK(mf.findMedian() == Approx((double)N / 2 - 0.5));
+
+    mf = MedianFinder();
+    for (int i = 0; i < N; i++) {
+        mf.addNum(888);
+    }
+    CHECK(mf.findMedian() == Approx(888));
 }
 #endif
