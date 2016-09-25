@@ -75,13 +75,18 @@ public:
             return false;
         }
 
-        multiset<int> tree;
-        int end = 0;
-        while (end < nums.size()) {
-            end++;
+        set<int> tree;
+        for (int end = 1; end <= nums.size(); end++) {
             int mid = nums[end - 1];
 
-            auto it = tree.insert(mid);
+            auto p = tree.insert(mid);
+            auto it = p.first;
+            bool succ = p.second;
+            // duplicated num
+            if (!succ) {
+                return true;
+            }
+
             if (it != tree.begin()) {
                 it--;
                 int left = *it;
@@ -103,9 +108,8 @@ public:
             if (tree.size() == dist_lim + 1) {
                 int begin = end - (dist_lim + 1);
                 assert(begin >= 0);
-                auto it = tree.find(nums[begin]);
-                assert(it != tree.end());
-                tree.erase(it);
+                int count = tree.erase(nums[begin]);
+                assert(count == 1);
             }
         }
 
