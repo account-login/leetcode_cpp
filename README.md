@@ -72,5 +72,5 @@ Solutions for leetcode using c++11.
 | [18. 4Sum](<https://leetcode.com/problems/4sum/>)                                                                              | [4sum](<src/4sum.cpp>)                           |  16ms |   86% |
 | [385. Mini Parser](<https://leetcode.com/problems/mini-parser/>)                                                               | [parser](<src/parser.cpp>)                       |  22ms |   99% |
 | [220. Contains Duplicate III](<https://leetcode.com/problems/contains-duplicate-iii/>)                                         | [contain_dup_iii](<src/contain_dup_iii.cpp>)     |  19ms |   92% |
-| [295. Find Median from Data Stream](<https://leetcode.com/problems/find-median-from-data-stream/>)                             | [median_stream](<src/median_stream.cpp>)         | 153ms |   50% |
+| [295. Find Median from Data Stream](<https://leetcode.com/problems/find-median-from-data-stream/>)                             | [median_stream](<src/median_stream.cpp>)         | 109ms |   97% |
 

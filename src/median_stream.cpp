@@ -1,5 +1,9 @@
-#include <iostream>
 #include <map>
+#include <algorithm>
+#include <utility>
+#include <type_traits>
+#include <functional>
+#include <iostream>
 
 #ifdef RUN_TEST
 #   define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
@@ -9,6 +13,19 @@
 #endif
 #include <cassert>
 
+// select an implementation
+#ifdef ALGO_heap
+#   define ALGO heap
+#elif defined(ALGO_map)
+#   define ALGO map
+#else
+#   define ALGO_heap 1
+#   define ALGO heap
+#endif
+
+#define __SUFFIX(a, b) a##b
+#define _SUFFIX(a, b) __SUFFIX(a, b)
+
 
 // https://leetcode.com/problems/find-median-from-data-stream/
 
@@ -16,7 +33,7 @@
 using namespace std;
 
 
-class MedianFinder {
+class MedianFinder_map {
 public:
     // { num, count }
     map<int, int> tree;
@@ -93,6 +110,84 @@ public:
     }
 };
 
+
+class MedianFinder_heap {
+public:
+    vector<int> max_heap;
+    vector<int> min_heap;
+
+    // Adds a number into the data structure.
+    void addNum(int num) {
+        if (max_heap.size() == 0 && min_heap.size() == 0) {
+            max_heap.push_back(num);
+        } else if (max_heap.size() == 1 && min_heap.size() == 0) {
+            min_heap.push_back(num);
+            if (min_heap[0] < max_heap[0]) {
+                swap(min_heap[0], max_heap[0]);
+            }
+        } else if (max_heap.size() == 0 && min_heap.size() == 1) {
+            max_heap.push_back(num);
+            if (min_heap[0] < max_heap[0]) {
+                swap(min_heap[0], max_heap[0]);
+            }
+        } else {
+            bool use_max;
+            if (num > min_heap[0]) {
+                // must use min_heap
+                use_max = false;
+            } else if (num < max_heap[0]) {
+                // must use max_heap
+                use_max = true;
+            } else {
+                // use the smaller heap
+                use_max = (max_heap.size() < min_heap.size());
+            }
+
+            if (use_max) {
+                max_heap.push_back(num);
+                push_heap(max_heap.begin(), max_heap.end());
+            } else {
+                min_heap.push_back(num);
+                push_heap(min_heap.begin(), min_heap.end(), greater<int>());
+            }
+
+            // balance
+            if (max_heap.size() > min_heap.size() + 1) {
+                pop_heap(max_heap.begin(), max_heap.end());
+                int popped = max_heap.back();
+                max_heap.pop_back();
+
+                min_heap.push_back(popped);
+                push_heap(min_heap.begin(), min_heap.end(), greater<int>());
+            } else if (min_heap.size() > max_heap.size() + 1) {
+                pop_heap(min_heap.begin(), min_heap.end(), greater<int>());
+                int popped = min_heap.back();
+                min_heap.pop_back();
+
+                max_heap.push_back(popped);
+                push_heap(max_heap.begin(), max_heap.end());
+            }
+        }
+    }
+
+    // Returns the median of current data stream
+    double findMedian() {
+        assert(!(max_heap.size() == 0 && min_heap.size() == 0));
+
+        if (max_heap.size() > min_heap.size()) {
+            return max_heap[0];
+        } else if (max_heap.size() < min_heap.size()) {
+            return min_heap[0];
+        } else {    // max_heap.size() == min_heap.size()
+            return (max_heap[0] + min_heap[0]) / 2.0;
+        }
+    }
+};
+
+
+typedef _SUFFIX(MedianFinder_, ALGO) MedianFinder;
+
+
 // Your MedianFinder object will be instantiated and called as such:
 // MedianFinder mf;
 // mf.addNum(1);
@@ -101,7 +196,8 @@ public:
 
 #ifdef RUN_TEST
 TEST_CASE("295. Find Median from Data Stream") {
-    auto mf = MedianFinder();
+#   ifdef ALGO_map
+    auto mf = MedianFinder_map();
 
     mf.addNum(5);
     CHECK(mf.tree[5] == 1);
@@ -143,5 +239,31 @@ TEST_CASE("295. Find Median from Data Stream") {
         mf.addNum(888);
     }
     CHECK(mf.findMedian() == Approx(888));
+
+#   elif defined(ALGO_heap)
+    auto mf = MedianFinder_heap();
+    mf.addNum(5);
+    CHECK(mf.findMedian() == Approx(5));
+
+    mf.addNum(5);
+    CHECK(mf.findMedian() == Approx(5));
+
+    mf.addNum(7);
+    CHECK(mf.findMedian() == Approx(5));
+
+    mf.addNum(9);
+    CHECK(mf.max_heap.size() == 2);
+    CHECK(mf.min_heap.size() == 2);
+    CHECK(mf.findMedian() == Approx(6));
+
+    mf.addNum(9);
+    CHECK(mf.findMedian() == Approx(7));
+
+    mf.addNum(1);
+    CHECK(mf.findMedian() == Approx(6));
+
+#   else
+    assert(0);
+#   endif
 }
 #endif
