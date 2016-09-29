@@ -20,7 +20,10 @@ clean:
 %: build/%
 	[[ -n "$(TEST)" ]] && ./build/$* -d yes -s || :
 
-build/%: src/%.cpp
-	$(CXX) $(CXXFLAGS) -o build/$* $<
+build/%: src/%.cpp build/catch_main.o
+	$(CXX) $(CXXFLAGS) -o build/$* $^
+
+build/catch_main.o: src/catch_main.cpp
+	$(CXX) $(CXXFLAGS) -c -o build/catch_main.o $^
 
 src/%.cpp: src/catch.hpp
