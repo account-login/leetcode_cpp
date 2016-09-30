@@ -23,7 +23,7 @@ clean:
 build/%: src/%.cpp build/catch_main.o
 	$(CXX) $(CXXFLAGS) -o build/$* $^
 
-build/catch_main.o: src/catch_main.cpp
-	$(CXX) $(CXXFLAGS) -c -o build/catch_main.o $^
+build/catch_main.o: src/catch.hpp
+	$(CXX) $(CXXFLAGS) -DCATCH_CONFIG_MAIN -xc++ -c -o build/catch_main.o $^
 
 src/%.cpp: src/catch.hpp
