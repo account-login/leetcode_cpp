@@ -49,9 +49,13 @@ public:
             scores[i] += delta;
 
             if (up) {
-                if (i + 1 < size && ratings[i + 1] > ratings[i]) {
+                if (i + 1 == size) {
+                    break;
+                }
+
+                if (ratings[i + 1] > ratings[i]) {
                     // climb up
-                } else if (i + 1 < size && ratings[i + 1] == ratings[i]) {
+                } else if (ratings[i + 1] == ratings[i]) {
                     // at platform
                     delta -= scores[i];
                 } else {
