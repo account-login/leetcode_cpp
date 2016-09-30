@@ -34,3 +34,6 @@
 # TZ
 build/
 leetcode_cpp.*
+*.gcda
+*.gcno
+*.gcov

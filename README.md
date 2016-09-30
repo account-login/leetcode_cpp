@@ -26,6 +26,13 @@ Solutions for leetcode using c++11.
     TEST=1 CXXFLAGS=-pg make <prog>
     gprof build/<prog> gmon.out >prof.txt
     ```
+    
+-   Coverage
+    
+    ```
+    TEST=1 CXXFLAGS=--coverage make <prog>
+    gcov <prog>
+    ```
 
 -   Run all leetcodes:
 
