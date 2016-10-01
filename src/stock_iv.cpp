@@ -48,109 +48,6 @@ namespace std {
 }
 
 
-class Solution_mle {
-public:
-    vector<vector<int>> cache;
-
-    int maxProfit(int k, const vector<int> &prices) {
-        auto segs = prices_to_segment(prices);
-        k = min(k, (int)segs.size());
-
-        if (k == 0) {
-            return 0;
-        }
-
-        this->cache.clear();
-        for (int i = 0; i < segs.size(); i++) {
-            this->cache.emplace_back(k, -1);
-        }
-        return max_profit(k, prices, segs.begin(), segs.end());
-    }
-
-    vector<Segment> prices_to_segment(const vector<int> &prices) {
-        vector<Segment> segs;
-        int start = 0;
-        int size = prices.size();
-        for (int i = 0; i <= size; i++) {
-            if (i + 1 >= size || prices[i] > prices[i + 1]) {
-                if (i > start) {
-                    segs.emplace_back(start, i);
-                }
-
-                start = i + 1;
-            }
-        }
-
-        return segs;
-    }
-
-    int max_profit(
-        int k,
-        const vector<int> &prices,
-        vector<Segment>::const_iterator begin,
-        vector<Segment>::const_iterator end)
-    {
-        assert(k >= 1);
-
-        if (begin >= end) {
-            return 0;
-        }
-
-        if (k > end - begin) {
-            k = end - begin;
-        }
-
-        if (this->cache[end - begin - 1][k - 1] >= 0) {
-            return this->cache[end - begin - 1][k - 1];
-        }
-
-        if (k == end - begin) {
-            int ans = accumulate(begin, end, 0, [&](int i, const Segment &s2) {
-                return i + prices[s2.stop] - prices[s2.start];
-            });
-            this->cache[end - begin - 1][k - 1] = ans;
-            return ans;
-        } else {
-            int win = 0;
-
-            // buying time
-            auto first = begin;
-            do {
-                int min_sell_price = prices[first->stop];
-                for (auto it = first; it != end; it++) {
-                    if (prices[it->start] < prices[first->start]) {
-                        // more suitable time to buy
-                        break;
-                    }
-
-                    if (prices[it->stop] >= min_sell_price) {
-                        // sell
-                        int profit = prices[it->stop] - prices[first->start];
-                        if (k > 1) {
-                            profit += max_profit(k - 1, prices, it + 1, end);
-                        }
-                        win = max(win, profit);
-
-                        min_sell_price = prices[it->stop];
-                    }
-                }
-
-                // next try
-                auto prev_first = first;
-                for (first = first + 1; first != end; first++) {
-                    if (prices[first->start] < prices[prev_first->start]) {
-                        break;
-                    }
-                }
-            } while (first != end);
-
-            this->cache[end - begin - 1][k - 1] = win;
-            return win;
-        }
-    }
-};
-
-
 class Solution {
 public:
     int maxProfit(int k, const vector<int> &prices) {
@@ -164,13 +61,23 @@ public:
         vector<int> dp_to(len, 0);
         vector<int> dp_from(len, 0);
         for (int start = k - 1; start >= 0; start--) {
+            int last_i;
             int end = start + len;
             for (int i = end - 1; i >= start; i--) {
                 dp_to[i - start] = 0;
+
                 for(int j = i; j < end; j++) {
-                    // j is more suitable to buy than i, stop searching.
-                    if (j != i && prices[segs[j].start] <= prices[segs[i].start]) {
-                        break;
+                    if (j != i && j == last_i) {
+                        if (prices[segs[j].start] <= prices[segs[i].start]) {
+                            break;
+                        } else {
+                            int delta = prices[segs[last_i].start] - prices[segs[i].start];
+                            int alternate = dp_to[last_i - start] + delta;
+                            dp_to[i - start] = max(dp_to[i - start], alternate);
+
+                            last_i = i;
+                            break;
+                        }
                     }
 
                     int profit = prices[segs[j].stop] - prices[segs[i].start];
@@ -178,8 +85,10 @@ public:
                     dp_to[i - start] = max(dp_to[i - start], profit);
                 }
 
-                if (i < end - 1) {
-                    dp_to[i - start] = max(dp_to[i - start], dp_to[i - start + 1]);
+                if (i < end - 1 && dp_to[i - start + 1] > dp_to[i - start]) {
+                    dp_to[i - start] = dp_to[i - start + 1];
+                } else {
+                    last_i = i; // init
                 }
             }
 
