@@ -168,7 +168,8 @@ public:
             for (int i = end - 1; i >= start; i--) {
                 dp_to[i - start] = 0;
                 for(int j = i; j < end; j++) {
-                    if (prices[segs[j].start] < prices[segs[i].start]) {
+                    // j is more suitable to buy than i, stop searching.
+                    if (j != i && prices[segs[j].start] <= prices[segs[i].start]) {
                         break;
                     }
 

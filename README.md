@@ -81,5 +81,5 @@ Solutions for leetcode using c++11.
 | [220. Contains Duplicate III](<https://leetcode.com/problems/contains-duplicate-iii/>)                                         | [contain_dup_iii](<src/contain_dup_iii.cpp>)     |  19ms |   92% |
 | [295. Find Median from Data Stream](<https://leetcode.com/problems/find-median-from-data-stream/>)                             | [median_stream](<src/median_stream.cpp>)         | 109ms |   97% |
 | [135. Candy](<https://leetcode.com/problems/candy/>)                                                                           | [candy](<src/candy.cpp>)                         |  42ms |   31% |
-| [188. Best Time to Buy and Sell Stock IV](<https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/>)                 | [stock_iv](<src/stock_iv.cpp>)                   |  16ms |   13% |
+| [188. Best Time to Buy and Sell Stock IV](<https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/>)                 | [stock_iv](<src/stock_iv.cpp>)                   |   9ms |   42% |
 
