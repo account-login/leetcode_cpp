@@ -3,7 +3,7 @@
 
 #ifdef RUN_TEST
 #   include "catch.hpp"
-#   include "valid_bst.h"
+#   include "tree_node.h"
 #else
 #   define NDEBUG   // remove assert() call
 #endif

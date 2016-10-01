@@ -83,4 +83,5 @@ Solutions for leetcode using c++11.
 | [135. Candy](<https://leetcode.com/problems/candy/>)                                                                           | [candy](<src/candy.cpp>)                         |  42ms |   31% |
 | [188. Best Time to Buy and Sell Stock IV](<https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/>)                 | [stock_iv](<src/stock_iv.cpp>)                   |   9ms |   42% |
 | [97. Interleaving String](<https://leetcode.com/problems/interleaving-string/>)                                                | [interleave](<src/interleave.cpp>)               |   3ms |   60% |
+| [124. Binary Tree Maximum Path Sum](<https://leetcode.com/problems/binary-tree-maximum-path-sum/>)                             | [tree_path_sum](<src/tree_path_sum.cpp>)         |  29ms |   54% |
 
