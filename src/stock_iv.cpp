@@ -61,23 +61,13 @@ public:
         vector<int> dp_to(len, 0);
         vector<int> dp_from(len, 0);
         for (int start = k - 1; start >= 0; start--) {
-            int last_i;
             int end = start + len;
             for (int i = end - 1; i >= start; i--) {
                 dp_to[i - start] = 0;
-
                 for(int j = i; j < end; j++) {
-                    if (j != i && j == last_i) {
-                        if (prices[segs[j].start] <= prices[segs[i].start]) {
-                            break;
-                        } else {
-                            int delta = prices[segs[last_i].start] - prices[segs[i].start];
-                            int alternate = dp_to[last_i - start] + delta;
-                            dp_to[i - start] = max(dp_to[i - start], alternate);
-
-                            last_i = i;
-                            break;
-                        }
+                    // j is more suitable to buy than i, stop searching.
+                    if (j != i && prices[segs[j].start] <= prices[segs[i].start]) {
+                        break;
                     }
 
                     int profit = prices[segs[j].stop] - prices[segs[i].start];
@@ -85,10 +75,8 @@ public:
                     dp_to[i - start] = max(dp_to[i - start], profit);
                 }
 
-                if (i < end - 1 && dp_to[i - start + 1] > dp_to[i - start]) {
-                    dp_to[i - start] = dp_to[i - start + 1];
-                } else {
-                    last_i = i; // init
+                if (i < end - 1) {
+                    dp_to[i - start] = max(dp_to[i - start], dp_to[i - start + 1]);
                 }
             }
 
