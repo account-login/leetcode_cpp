@@ -86,4 +86,5 @@ Solutions for leetcode using c++11.
 | [124. Binary Tree Maximum Path Sum](<https://leetcode.com/problems/binary-tree-maximum-path-sum/>)                             | [tree_path_sum](<src/tree_path_sum.cpp>)         |  29ms |   54% |
 | [41. First Missing Positive](<https://leetcode.com/problems/first-missing-positive/>)                                          | [first_missing](<src/first_missing.cpp>)         |   3ms |   19% |
 | [23. Merge k Sorted Lists](<https://leetcode.com/problems/merge-k-sorted-lists/>)                                              | [merge_k](<src/merge_k.cpp>)                     |  42ms |   57% |
+| [85. Maximal Rectangle](<https://leetcode.com/problems/maximal-rectangle/>)                                                    | [max_rect](<src/max_rect.cpp>)                   |  49ms |    8% |
 
