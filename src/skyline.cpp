@@ -42,7 +42,7 @@ public:
         queue_t q;
 
         for (auto it = buildings.begin(); !q.empty() || it != buildings.end(); ) {
-            if (q.empty()) {
+            if (q.empty()) {    // enter first building
                 q.emplace(*it);
                 ans.push_back({ (*it)[0], (*it)[2] });
                 it++;
@@ -52,16 +52,19 @@ public:
                 }
                 q.emplace(*it);
                 it++;
-            } else {
+            } else {    // top building exited
                 int down_pos = q.top().right;
+                int orig_height = q.top().height;
                 do {
                     q.pop();
                 } while (!q.empty() && q.top().right <= down_pos);   // expired building
 
                 if (q.empty()) {
                     ans.push_back({ down_pos, 0 });
-                } else {
-                    ans.push_back({ down_pos, q.top().height });
+                } else {    // lower bulding
+                    if (q.top().height < orig_height) {
+                        ans.push_back({ down_pos, q.top().height });
+                    }
                 }
             }
         }
@@ -116,6 +119,13 @@ TEST_CASE("218. The Skyline Problem") {
         {19, 24,  8}
     };
     skyline = { {2, 10}, {3, 15}, {7, 12}, {12, 0}, {15, 10}, {20, 8}, {24, 0} };
+    CHECK(s.getSkyline(buildings) == skyline);
+
+    buildings = {
+        { 2, 3, 10 },
+        { 3, 5, 10 }
+    };
+    skyline = { {2, 10}, {5, 0} };
     CHECK(s.getSkyline(buildings) == skyline);
 }
 #endif
