@@ -50,6 +50,12 @@ namespace std {
 
 class Solution {
 public:
+    // for https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
+    // 123. Best Time to Buy and Sell Stock III
+    int maxProfit(const vector<int> &prices) {
+        return maxProfit(2, prices);
+    }
+
     int maxProfit(int k, const vector<int> &prices) {
         auto segs = prices_to_segment(prices);
         int n = segs.size();
