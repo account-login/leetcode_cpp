@@ -88,4 +88,5 @@ Solutions for leetcode using c++11.
 | [23. Merge k Sorted Lists](<https://leetcode.com/problems/merge-k-sorted-lists/>)                                              | [merge_k](<src/merge_k.cpp>)                     |  42ms |   57% |
 | [85. Maximal Rectangle](<https://leetcode.com/problems/maximal-rectangle/>)                                                    | [max_rect](<src/max_rect.cpp>)                   |  49ms |    8% |
 | [287. Find the Duplicate Number](<https://leetcode.com/problems/find-the-duplicate-number/>)                                   | [dup_num](<src/dup_num.cpp>)                     |  22ms |   28% |
+| [218. The Skyline Problem](<https://leetcode.com/problems/the-skyline-problem/>)                                               | [skyline](<src/skyline.cpp>)                     |       |       |
 
