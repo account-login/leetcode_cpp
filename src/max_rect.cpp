@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <vector>
-#include <queue>
 #include <iostream>
 
 #ifdef RUN_TEST
@@ -28,40 +27,40 @@ public:
 
         int ans = 0;
         for (int x1 = 0; x1 < xlen; x1++) {
-            queue<int> q;
-            for (int i = 0; i < ylen; i++) {
-                q.push(i);
-            }
+            vector<char> dp(ylen, true);
 
-            for (int x2 = x1; x2 < xlen && !q.empty(); x2++) {
-                int max_y_width = 0;
-                int y_width = 0;
-                int last_y = -1;
+            bool rect_found;
+            for (int x2 = x1; x2 < xlen; x2++) {
+                int y_begin = -1;
+                rect_found = false;
+                for (int y = 0; y < ylen; y++) {
+                    dp[y] = dp[y] && (matrix[x2][y] == '1');
 
-                int qsize = q.size();
-                for (int i = 0; i < qsize; i++) {
-                    int y = q.front();
-
-                    if (last_y >= 0 && last_y + 1 != y) {
-                        max_y_width = max(max_y_width, y_width);
-                        y_width = 0;
-                    }
-
-                    if (matrix[x2][y] == '1') {
-                        q.push(y);
-                        y_width++;
+                    if (dp[y]) {
+                        rect_found = true;
+                        if (y_begin < 0) {
+                            y_begin = y;
+                        }
                     } else {
-                        max_y_width = max(max_y_width, y_width);
-                        y_width = 0;
+                        // max rect found
+                        if (y_begin >= 0) {
+                            int area = (x2 - x1 + 1) * (y - y_begin);
+                            ans = max(ans, area);
+                            y_begin = -1;
+                        }
                     }
-
-                    last_y = y;
-                    q.pop();
                 }
-                max_y_width = max(max_y_width, y_width);
 
-                int area = (x2 - x1 + 1) * max_y_width;
-                ans = max(ans, area);
+                if (!rect_found) {
+                    // stop searching x2
+                    break;
+                }
+
+                // last rect
+                if (y_begin >= 0) {
+                    int area = (x2 - x1 + 1) * (ylen - y_begin);
+                    ans = max(ans, area);
+                }
             }
         }
 
@@ -124,18 +123,5 @@ TEST_CASE("85. Maximal Rectangle") {
         "11111111111"
     });
     CHECK(s.maximalRectangle(M) == 33);
-
-    M = make_mat({
-        "00010111",
-        "01100101",
-        "10111101",
-        "00010000",
-        "00100010",
-        "11100111",
-        "10011001",
-        "01001100",
-        "10010000"
-    });
-    CHECK(s.maximalRectangle(M) == 4);
 }
 #endif
