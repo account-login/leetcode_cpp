@@ -42,12 +42,17 @@ public:
         queue_t q;
 
         for (auto it = buildings.begin(); !q.empty() || it != buildings.end(); ) {
-            if (q.empty()) {    // enter first building
+            if (q.empty()) {    // enter building from ground
                 q.emplace(*it);
                 ans.push_back({ (*it)[0], (*it)[2] });
                 it++;
-            } else if (it != buildings.end() && (*it)[0] <= q.top().right) {  // building.left <= top.right
-                if ((*it)[2] > q.top().height) {  // building.height > top.height
+            } else if (it != buildings.end() && (*it)[0] <= q.top().right) {
+                // building.left <= top.right, overlapping with current top building.
+                if ((*it)[2] > q.top().height) {
+                    // building.height > top.height, higher than top building.
+                    if ((*it)[0] == q.top().left) {
+                        ans.pop_back(); // override previous top building.
+                    }
                     ans.push_back({ (*it)[0], (*it)[2] });
                 }
                 q.emplace(*it);
@@ -57,12 +62,12 @@ public:
                 int orig_height = q.top().height;
                 do {
                     q.pop();
-                } while (!q.empty() && q.top().right <= down_pos);   // expired building
+                } while (!q.empty() && q.top().right <= down_pos);   // pop exited building
 
-                if (q.empty()) {
+                if (q.empty()) {    // no lower buliding, ground reached.
                     ans.push_back({ down_pos, 0 });
-                } else {    // lower bulding
-                    if (q.top().height < orig_height) {
+                } else {    // lower building
+                    if (q.top().height < orig_height) { // is building really lower than current?
                         ans.push_back({ down_pos, q.top().height });
                     }
                 }
@@ -126,6 +131,14 @@ TEST_CASE("218. The Skyline Problem") {
         { 3, 5, 10 }
     };
     skyline = { {2, 10}, {5, 0} };
+    CHECK(s.getSkyline(buildings) == skyline);
+
+    buildings = {
+        { 1, 2, 1 },
+        { 1, 2, 2 },
+        { 1, 2, 3 }
+    };
+    skyline = { {1, 3}, {2, 0} };
     CHECK(s.getSkyline(buildings) == skyline);
 }
 #endif
