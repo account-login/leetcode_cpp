@@ -1,6 +1,5 @@
 #include <string>
 #include <vector>
-#include <utility>
 #include <iostream>
 
 #ifdef RUN_TEST
@@ -19,11 +18,10 @@ using namespace std;
 class Solution {
 public:
     string simplifyPath(const string &path) {
-        vector<pair<int, int>> stk;
+        vector<string> stk;
 
         bool is_abs = path[0] == '/';
         int word_begin = 0;
-        int owned = 0;
         for (size_t i = 0; i < path.size() + 1; i++) {
             if (path[i] == '/' || path[i] == '\0' ) {
                 if (i == word_begin + 1 && path[i - 1] == '.') {
@@ -34,34 +32,24 @@ public:
                     // pop ..
                     if (stk.empty()) {
                         if (!is_abs) {  // /.. -> /
-                            owned++;
+                            stk.push_back("..");    // can not pop
                         }
                     } else {
-                        stk.pop_back();
+                        if (stk.back() == "..") {
+                            stk.push_back("..");    // can not pop
+                        } else {
+                            stk.pop_back();
+                        }
                     }
                 } else if (i > word_begin) {
                     // push word
-                    if (owned > 0) {
-                        owned--;
-                    } else {
-                        stk.push_back({ word_begin, i - word_begin });
-                    }
+                    stk.push_back(path.substr(word_begin, i - word_begin));
                 }
                 word_begin = i + 1;
             }
         }
 
-        if (owned > 0) {
-            assert(!is_abs);
-            string ans;
-            string sep = "";
-            for(; owned > 0; owned--) {
-                ans += sep;
-                ans += "..";
-                sep = "/";
-            }
-            return ans;
-        } else if (stk.empty()) {
+        if (stk.empty()) {
             if (is_abs) {
                 return "/";
             } else {
@@ -69,13 +57,13 @@ public:
             }
         } else {
             string ans = "";
-            for (const auto &p : stk) {
+            for (const auto &str : stk) {
                 if (is_abs) {
                     ans += "/";
                 } else {    // skip leading '/' if not absolute path
                     is_abs = true;
                 }
-                ans += path.substr(p.first, p.second);
+                ans += str;
             }
             return ans;
         }
@@ -99,8 +87,10 @@ TEST_CASE("71. Simplify Path") {
     CHECK(s.simplifyPath("./asdf/../../..") == "../..");
     CHECK(s.simplifyPath("./.././") == "..");
 
-    CHECK(s.simplifyPath("../a") == ".");
-    CHECK(s.simplifyPath("../a/../../bcd") == "..");
+    CHECK(s.simplifyPath("../a") == "../a");
+    CHECK(s.simplifyPath("../a/../../bcd") == "../../bcd");
+    CHECK(s.simplifyPath("../../a/b/../bcd") == "../../a/bcd");
+    CHECK(s.simplifyPath("asdf/d/../../../asd") == "../asd");
 
     CHECK(s.simplifyPath("asdf/asdf/../../cda/.") == "cda");
     CHECK(s.simplifyPath("./asdf/asdf/../../cda/.") == "cda");
