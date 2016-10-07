@@ -89,4 +89,5 @@ Solutions for leetcode using c++11.
 | [85. Maximal Rectangle](<https://leetcode.com/problems/maximal-rectangle/>)                                                    | [max_rect](<src/max_rect.cpp>)                   |  49ms |    8% |
 | [287. Find the Duplicate Number](<https://leetcode.com/problems/find-the-duplicate-number/>)                                   | [dup_num](<src/dup_num.cpp>)                     |  22ms |   28% |
 | [218. The Skyline Problem](<https://leetcode.com/problems/the-skyline-problem/>)                                               | [skyline](<src/skyline.cpp>)                     |  63ms |   62% |
+| [71. Simplify Path](<https://leetcode.com/problems/simplify-path/>)                                                            | [simp_path](<src/simp_path.cpp>)                 |   6ms |   50% |
 
