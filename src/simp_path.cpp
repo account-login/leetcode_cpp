@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <utility>
 #include <iostream>
 
 #ifdef RUN_TEST
@@ -18,7 +19,7 @@ using namespace std;
 class Solution {
 public:
     string simplifyPath(const string &path) {
-        vector<string> stk;
+        vector<pair<int, int>> stk;
 
         bool is_abs = path[0] == '/';
         int word_begin = 0;
@@ -43,7 +44,7 @@ public:
                     if (owned > 0) {
                         owned--;
                     } else {
-                        stk.push_back(path.substr(word_begin, i - word_begin));
+                        stk.push_back({ word_begin, i - word_begin });
                     }
                 }
                 word_begin = i + 1;
@@ -68,13 +69,13 @@ public:
             }
         } else {
             string ans = "";
-            for (const auto &str : stk) {
+            for (const auto &p : stk) {
                 if (is_abs) {
                     ans += "/";
                 } else {    // skip leading '/' if not absolute path
                     is_abs = true;
                 }
-                ans += str;
+                ans += path.substr(p.first, p.second);
             }
             return ans;
         }
