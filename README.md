@@ -92,5 +92,5 @@ Solutions for leetcode using c++11.
 | [71. Simplify Path](<https://leetcode.com/problems/simplify-path/>)                                                            | [simp_path](<src/simp_path.cpp>)                 |   6ms |   50% |
 | [138. Copy List with Random Pointer](<https://leetcode.com/problems/copy-list-with-random-pointer/>)                           | [copy_list](<src/copy_list.cpp>)                 |  99ms |   97% |
 | [233. Number of Digit One](<https://leetcode.com/problems/number-of-digit-one/>)                                               | [count_one](<src/count_one.cpp>)                 |   0ms |       |
-| [133. Clone Graph](<https://leetcode.com/problems/clone-graph/>)                                                               | [clone_graph](<src/clone_graph.cpp>)             |  89ms |   21% |
+| [133. Clone Graph](<https://leetcode.com/problems/clone-graph/>)                                                               | [clone_graph](<src/clone_graph.cpp>)             |  69ms |   88% |
 

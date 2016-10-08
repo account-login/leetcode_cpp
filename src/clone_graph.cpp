@@ -30,41 +30,49 @@ struct UndirectedGraphNode {
 
 class Solution {
 public:
-    UndirectedGraphNode *cloneGraph(const UndirectedGraphNode *node) {
+    UndirectedGraphNode *cloneGraph(UndirectedGraphNode *node) {
         if (node == nullptr) {
             return nullptr;
         }
 
-        unordered_set<const UndirectedGraphNode *> visited;
-        unordered_map<const UndirectedGraphNode *, UndirectedGraphNode *> old2new;
+        unordered_set<UndirectedGraphNode *> visited;
+        vector<UndirectedGraphNode *> visited_vec;  // track nodes in vector for faster iteration
 
-        auto visitor = [&](const UndirectedGraphNode *node) {
+        auto visitor = [&](UndirectedGraphNode *node) {
+            visited_vec.push_back(node);
             auto new_node = new UndirectedGraphNode(node->label);
-            old2new[node] = new_node;
+            node->neighbors.push_back(new_node);    // create link to new node
         };
         travel(node, visited, visitor);
 
-        for (auto node : visited) {
-            auto new_node = old2new[node];
-            for (auto old_neighbor : node->neighbors) {
-                new_node->neighbors.push_back(old2new[old_neighbor]);
+        for (auto node : visited_vec) {
+            auto new_node = node->neighbors.back();
+            for (auto it = node->neighbors.begin(); it < node->neighbors.end() - 1; it++) {
+                auto old_neighbor = *it;
+                // convert neighbors from old node to new node
+                new_node->neighbors.push_back(old_neighbor->neighbors.back());
             }
         }
 
-        return old2new[node];
+        auto ans = node->neighbors.back();
+        for (auto node : visited_vec) {
+            node->neighbors.pop_back();     // remove link to new node
+        }
+
+        return ans;
     }
 
     void travel(
-        const UndirectedGraphNode *node,
-        unordered_set<const UndirectedGraphNode *> &visited,
-        function<void (const UndirectedGraphNode *)> callback)
+        UndirectedGraphNode *node,
+        unordered_set<UndirectedGraphNode *> &visited,
+        function<void (UndirectedGraphNode *)> callback)
     {
         if (visited.count(node) == 0) {
-            callback(node);
             visited.insert(node);
             for (auto ptr : node->neighbors) {
                 travel(ptr, visited, callback);
             }
+            callback(node);
         }
     }
 };
@@ -73,5 +81,7 @@ public:
 #ifdef RUN_TEST
 TEST_CASE("133. Clone Graph") {
     Solution s;
+
+    CHECK(s.cloneGraph(nullptr) == nullptr);
 }
 #endif
