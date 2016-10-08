@@ -91,4 +91,5 @@ Solutions for leetcode using c++11.
 | [218. The Skyline Problem](<https://leetcode.com/problems/the-skyline-problem/>)                                               | [skyline](<src/skyline.cpp>)                     |  63ms |   62% |
 | [71. Simplify Path](<https://leetcode.com/problems/simplify-path/>)                                                            | [simp_path](<src/simp_path.cpp>)                 |   6ms |   50% |
 | [138. Copy List with Random Pointer](<https://leetcode.com/problems/copy-list-with-random-pointer/>)                           | [copy_list](<src/copy_list.cpp>)                 |  99ms |   97% |
+| [233. Number of Digit One](<https://leetcode.com/problems/number-of-digit-one/>)                                               | [count_one](<src/count_one.cpp>)                 |   0ms |       |
 
