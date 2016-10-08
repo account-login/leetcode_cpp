@@ -90,4 +90,5 @@ Solutions for leetcode using c++11.
 | [287. Find the Duplicate Number](<https://leetcode.com/problems/find-the-duplicate-number/>)                                   | [dup_num](<src/dup_num.cpp>)                     |  22ms |   28% |
 | [218. The Skyline Problem](<https://leetcode.com/problems/the-skyline-problem/>)                                               | [skyline](<src/skyline.cpp>)                     |  63ms |   62% |
 | [71. Simplify Path](<https://leetcode.com/problems/simplify-path/>)                                                            | [simp_path](<src/simp_path.cpp>)                 |   6ms |   50% |
+| [138. Copy List with Random Pointer](<https://leetcode.com/problems/copy-list-with-random-pointer/>)                           | [copy_list](<src/copy_list.cpp>)                 |  99ms |   97% |
 
