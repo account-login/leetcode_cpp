@@ -5,6 +5,7 @@
 
 #ifdef RUN_TEST
 #   include "catch.hpp"
+#   define private public
 #else
 #   define NDEBUG   // remove assert() call
 #endif
@@ -18,12 +19,20 @@ using namespace std;
 
 
 class Solution {
+
 private:
     int power10[10];
+    int count_one_d[10];
+
 public:
     Solution() {
         for (int i = 0; i < 10; i++) {
             this->power10[i] = (int)pow(10, i);
+        }
+
+        this->count_one_d[0] = 0;
+        for (int i = 1; i < 10; i++) {
+            this->count_one_d[i] = this->count_one_d[i - 1] * 10 + this->power10[i - 1];
         }
     }
 
@@ -35,8 +44,7 @@ public:
         int first_digit = digits[0] - '0';
         int len = digits.size();
 
-        int ones, nums;
-        tie(ones, nums) = count_one_d(len - 1);
+        int ones = count_one_d[len - 1];
 
         int total_ones = 0;
         total_ones += first_digit * ones;           // zxxx...
@@ -59,22 +67,6 @@ public:
 
         return total_ones;
     }
-
-    //  ones, nums
-    pair<int, int> count_one_d(int d) {
-        if (d == 0) {
-            return { 0, 0 };
-        } else {
-            int ones, nums;
-            tie(ones, nums) = count_one_d(d - 1);
-
-            int ret_ones = (this->power10[d - 1] + ones) + ones * 8 +    ones;
-            //             ^ 1xxx...                       ^ [2-9]xxx... ^ 0xxx...
-            int ret_nums = nums * 8 +   nums +    this->power10[d - 1];
-            //             ^[2-9]xxx... ^ 0xxx... ^ 1xxx...
-            return { ret_ones, ret_nums };
-        }
-    }
 };
 
 
@@ -91,9 +83,9 @@ namespace std {
 TEST_CASE("233. Number of Digit One") {
     Solution s;
 
-    CHECK(s.count_one_d(0) == make_pair(0, 0));
-    CHECK(s.count_one_d(1) == make_pair(1, 1));
-    CHECK(s.count_one_d(2) == make_pair(20, 19));
+    CHECK(s.count_one_d[0] == 0);
+    CHECK(s.count_one_d[1] == 1);
+    CHECK(s.count_one_d[2] == 20);
 
     CHECK(s.countDigitOne(0) == 0);
     CHECK(s.countDigitOne(1) == 1);
