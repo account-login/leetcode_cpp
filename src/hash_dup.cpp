@@ -25,24 +25,12 @@
 using namespace std;
 
 
-struct ValueWrapper {
-    int value;
-    bool flag = false;
-
-    ValueWrapper()
-        : value(0), flag(false)
-    {}
-
-    ValueWrapper(int value)
-        : value(value), flag(true)
-    {}
-};
-
-
 class RandomizedCollection {
 
 private:
-    vector<ValueWrapper> ctn;
+    vector<int> values;
+    using FlagsType = vector<bool>;
+    FlagsType flags;
     size_t _count;
     double _max_load_factor;
     hash<int> _hash_fn;
@@ -53,21 +41,22 @@ private:
      * @param val
      * @return Return true if \a ctn did not already contain \a val
      */
-    bool _insert(vector<ValueWrapper> &ctn, int val) {
-        int ans = false;
+    bool _insert(vector<int> &ctn, FlagsType &flags, int val) {
+        int found = false;
 
         size_t h = this->_hash_fn(val);
         h %= ctn.size();
-        while (ctn[h].flag) {
-            if (ctn[h].value == val) {
-                ans = true;
+        while (flags[h]) {
+            if (ctn[h] == val) {
+                found = true;
             }
             h++;
             h %= ctn.size();
         }
 
-        ctn[h] = ValueWrapper(val);
-        return !ans;
+        ctn[h] = val;
+        flags[h] = true;
+        return !found;
     }
 
     size_t _next_capacity(int prev) {
@@ -85,24 +74,24 @@ public:
     class iterator : public std::iterator<forward_iterator_tag, int> {
 
     private:
-        const vector<ValueWrapper> &ctn;
+        const RandomizedCollection &rc;
         size_t index;
 
     public:
-        iterator(const vector<ValueWrapper> &ctn, size_t index)
-            : ctn(ctn), index(index)
+        iterator(const RandomizedCollection &rc, size_t index)
+            : rc(rc), index(index)
         {}
 
          // Pre-increment
         iterator &operator++ () {
-            assert(this->index < this->ctn.size() && "WTF");
+            assert(this->index < this->rc.capacity() && "WTF");
 
             this->index++;
-            while (this->index < this->ctn.size() && !this->ctn[this->index].flag) {
+            while (this->index < this->rc.capacity() && !this->rc.flags[this->index]) {
                 this->index++;
             }
 
-            if (this->index == this->ctn.size()) {
+            if (this->index == this->rc.capacity()) {
                 // end()
                 this->index = numeric_limits<size_t>::max();
             }
@@ -119,7 +108,7 @@ public:
 
         // two-way comparison: v.begin() == v.cbegin() and vice versa
         bool operator == (const iterator &rhs) const {
-            return &this->ctn == &rhs.ctn && this->index == rhs.index;
+            return &this->rc == &rhs.rc && this->index == rhs.index;
         }
 
         bool operator != (const iterator &rhs) const {
@@ -127,9 +116,9 @@ public:
         }
 
         const int &operator *() const {
-            assert(this->index < this->ctn.size());
-            assert(this->ctn[this->index].flag);
-            return this->ctn[this->index].value;
+            assert(this->index < this->rc.capacity());
+            assert(this->rc.flags[this->index]);
+            return this->rc.values[this->index];
         }
 
         const int &operator->() const {
@@ -137,14 +126,14 @@ public:
         }
 
         friend ostream &operator << ( ostream &os, const iterator &it ) {
-            os << "<Iterator for 0x" << std::hex << &it.ctn << " index=" << it.index << ">";
+            os << "<Iterator for " << std::hex << &it.rc << " index=" << it.index << ">";
             return os;
         }
     };
 
     /** Initialize your data structure here. */
     RandomizedCollection()
-        : ctn(), _count(0), _max_load_factor(0.7)
+        : values(), flags(), _count(0), _max_load_factor(0.6)
     {}
 
     size_t size() const {
@@ -152,7 +141,7 @@ public:
     }
 
     size_t capacity() const {
-        return this->ctn.size();
+        return this->values.size();
     }
 
     double load_factor() const {
@@ -178,8 +167,8 @@ public:
             return this->end();
         }
 
-        iterator it(this->ctn, 0);
-        if (this->ctn[0].flag) {
+        iterator it(*this, 0);
+        if (this->flags[0]) {
             return it;
         } else {
             ++it;
@@ -188,7 +177,7 @@ public:
     }
 
     iterator end() const {
-        return iterator(this->ctn, numeric_limits<size_t>::max());
+        return iterator(*this, numeric_limits<size_t>::max());
     }
 
     /** Inserts a value to the collection.
@@ -203,20 +192,22 @@ public:
         assert(this->load_factor() < this->max_load_factor());
 
         this->_count++;
-        return this->_insert(this->ctn, val);
+        return this->_insert(this->values, this->flags, val);
     }
 
     void rehash(size_t new_cap) {
         assert(new_cap > this->size() / this->max_load_factor());
-        vector<ValueWrapper> new_ctn(new_cap);
+        vector<int> new_ctn(new_cap);
+        FlagsType new_flags(new_cap);
 
-        for (const auto &vw : this->ctn) {
-            if (vw.flag) {
-                this->_insert(new_ctn, vw.value);
+        for (int i = 0; i < this->capacity(); i++) {
+            if (this->flags[i]) {
+                this->_insert(new_ctn, new_flags, this->values[i]);
             }
         }
 
-        swap(this->ctn, new_ctn);
+        swap(this->values, new_ctn);
+        swap(this->flags, new_flags);
     }
 
     /** Removes a value from the collection.
@@ -234,8 +225,8 @@ public:
         int count = 0;
         size_t h = this->_hash_fn(val);
         h %= this->capacity();
-        while (this->ctn[h].flag && count < this->capacity()) {
-            if (this->ctn[h].value == val) {
+        while (this->flags[h] && count < this->capacity()) {
+            if (this->values[h] == val) {
                 last_found = h;
                 found = true;
             }
@@ -249,24 +240,24 @@ public:
         if (!found) {
             return false;
         } else {
-            this->ctn[last_found].flag = false;   // remove element
+            this->flags[last_found] = false;   // remove element
 
             // rehash next element
             vector<int> need_rehash;
             int count = 0;
             for (h = (last_found + 1) % this->capacity();
-                 this->ctn[h].flag && count < this->capacity();
+                 this->flags[h] && count < this->capacity();
                  h = (h + 1) % this->capacity())
             {
-                if (this->_hash_fn(this->ctn[h].value) % this->capacity() != h){
-                    need_rehash.push_back(this->ctn[h].value);
-                    this->ctn[h].flag = false;
+                if (this->_hash_fn(this->values[h]) % this->capacity() != h){
+                    need_rehash.push_back(this->values[h]);
+                    this->flags[h] = false;
                 }
                 count++;
             }
 
             for (int value : need_rehash) {
-                this->_insert(this->ctn, value);
+                this->_insert(this->values, this->flags, value);
             }
 
             this->_count--;
@@ -281,26 +272,28 @@ public:
         uniform_int_distribution<int> dis(0, this->capacity() - 1);
 
         for (int i = dis(rd); ; i = dis(rd)) {
-            if (this->ctn[i].flag) {
-                return this->ctn[i].value;
+            if (this->flags[i]) {
+                return this->values[i];
             }
         }
         assert(false);
     }
 
-    unordered_multiset<int> to_multi_set() const {
+#ifdef RUN_TEST
+    unordered_multiset<int> to_multiset() const {
         unordered_multiset<int> ans(this->begin(), this->end());
         return ans;
     }
 
     vector<pair<int, bool>> dump() const {
         vector<pair<int, bool>> ans;
-        for (auto &vw : this->ctn) {
-            ans.push_back({ vw.value, vw.flag });
+        for (int i = 0; i < this->capacity(); i++) {
+            ans.push_back({ this->values[i], this->flags[i] });
         }
 
         return ans;
     }
+#endif
 };
 
 /**
