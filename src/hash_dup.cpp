@@ -245,21 +245,16 @@ public:
             this->flags[last_found] = false;
 
             // rehash next element
-            vector<ElemType> need_rehash;
             int count = 0;
             for (h = (last_found + 1) % this->capacity();
                  this->flags[h] && count < this->capacity();
                  h = (h + 1) % this->capacity())
             {
                 if (this->_hash_fn(this->values[h]) % this->capacity() != h) {
-                    need_rehash.push_back(this->values[h]);
                     this->flags[h] = false;
+                    this->_insert(this->values, this->flags, this->values[h]);
                 }
                 count++;
-            }
-
-            for (const ElemType &value : need_rehash) {
-                this->_insert(this->values, this->flags, value);
             }
 
             this->_count--;
