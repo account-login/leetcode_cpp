@@ -25,15 +25,15 @@
 using namespace std;
 
 
-class RandomizedCollection {
+template<class ElemType, class FlagsType = vector<bool>>
+class HashMultiSetOpenAddress {
 
 private:
-    vector<int> values;
-    using FlagsType = vector<bool>;
+    vector<ElemType> values;
     FlagsType flags;
     size_t _count;
     double _max_load_factor;
-    hash<int> _hash_fn;
+    hash<ElemType> _hash_fn;
 
     /**
      * @brief _insert
@@ -41,8 +41,8 @@ private:
      * @param val
      * @return Return true if \a ctn did not already contain \a val
      */
-    bool _insert(vector<int> &ctn, FlagsType &flags, int val) {
-        int found = false;
+    bool _insert(vector<ElemType> &ctn, FlagsType &flags, const ElemType &val) {
+        bool found = false;
 
         size_t h = this->_hash_fn(val);
         h %= ctn.size();
@@ -71,14 +71,14 @@ private:
     }
 
 public:
-    class iterator : public std::iterator<forward_iterator_tag, int> {
+    class iterator : public std::iterator<forward_iterator_tag, ElemType> {
 
     private:
-        const RandomizedCollection &rc;
+        const HashMultiSetOpenAddress &rc;
         size_t index;
 
     public:
-        iterator(const RandomizedCollection &rc, size_t index)
+        iterator(const HashMultiSetOpenAddress &rc, size_t index)
             : rc(rc), index(index)
         {}
 
@@ -115,13 +115,13 @@ public:
             return !(*this == rhs);
         }
 
-        const int &operator *() const {
+        const ElemType &operator *() const {
             assert(this->index < this->rc.capacity());
             assert(this->rc.flags[this->index]);
             return this->rc.values[this->index];
         }
 
-        const int &operator->() const {
+        const ElemType &operator->() const {
             return this->operator *();
         }
 
@@ -132,7 +132,7 @@ public:
     };
 
     /** Initialize your data structure here. */
-    RandomizedCollection()
+    HashMultiSetOpenAddress()
         : values(), flags(), _count(0), _max_load_factor(0.6)
     {}
 
@@ -184,7 +184,7 @@ public:
      *
      * Returns true if the collection did not already contain the specified element.
      */
-    bool insert(int val) {
+    bool insert(const ElemType &val) {
         // rehash
         if (this->capacity() == 0 || this->load_factor() > this->max_load_factor()) {
             this->rehash(this->_next_capacity(this->capacity()));
@@ -197,7 +197,7 @@ public:
 
     void rehash(size_t new_cap) {
         assert(new_cap > this->size() / this->max_load_factor());
-        vector<int> new_ctn(new_cap);
+        vector<ElemType> new_ctn(new_cap);
         FlagsType new_flags(new_cap);
 
         for (int i = 0; i < this->capacity(); i++) {
@@ -214,7 +214,7 @@ public:
      *
      * Returns true if the collection contained the specified element.
      */
-    bool remove(int val) {
+    bool remove(const ElemType &val) {
         if (this->size() == 0) {    // capacity may be zero
             return false;
         }
@@ -240,23 +240,25 @@ public:
         if (!found) {
             return false;
         } else {
-            this->flags[last_found] = false;   // remove element
+            // remove element
+            this->values[last_found] = ElemType();  // replace old element with default one
+            this->flags[last_found] = false;
 
             // rehash next element
-            vector<int> need_rehash;
+            vector<ElemType> need_rehash;
             int count = 0;
             for (h = (last_found + 1) % this->capacity();
                  this->flags[h] && count < this->capacity();
                  h = (h + 1) % this->capacity())
             {
-                if (this->_hash_fn(this->values[h]) % this->capacity() != h){
+                if (this->_hash_fn(this->values[h]) % this->capacity() != h) {
                     need_rehash.push_back(this->values[h]);
                     this->flags[h] = false;
                 }
                 count++;
             }
 
-            for (int value : need_rehash) {
+            for (const ElemType &value : need_rehash) {
                 this->_insert(this->values, this->flags, value);
             }
 
@@ -266,7 +268,7 @@ public:
     }
 
     /** Get a random element from the collection. */
-    int getRandom() const {
+    const ElemType &getRandom() const {
         assert(this->size() > 0);   // capacity must not be zero
         random_device rd;
         uniform_int_distribution<int> dis(0, this->capacity() - 1);
@@ -280,13 +282,13 @@ public:
     }
 
 #ifdef RUN_TEST
-    unordered_multiset<int> to_multiset() const {
-        unordered_multiset<int> ans(this->begin(), this->end());
+    unordered_multiset<ElemType> to_multiset() const {
+        unordered_multiset<ElemType> ans(this->begin(), this->end());
         return ans;
     }
 
-    vector<pair<int, bool>> dump() const {
-        vector<pair<int, bool>> ans;
+    vector<pair<ElemType, bool>> dump() const {
+        vector<pair<ElemType, bool>> ans;
         for (int i = 0; i < this->capacity(); i++) {
             ans.push_back({ this->values[i], this->flags[i] });
         }
@@ -295,6 +297,8 @@ public:
     }
 #endif
 };
+
+typedef HashMultiSetOpenAddress<int> RandomizedCollection;
 
 /**
  * Your RandomizedCollection object will be instantiated and called as such:
@@ -306,13 +310,27 @@ public:
 
 
 #ifdef RUN_TEST
+TEST_CASE("Test on types other than int") {
+    HashMultiSetOpenAddress<string> mset;
+    mset.insert("asdf");
+    mset.insert("343");
+    mset.insert("asdf");
+    mset.insert("fda");
+    mset.remove("asdf");
+
+    unordered_multiset<string> expected = {
+        "asdf", "343", "fda"
+    };
+    CHECK(mset.to_multiset() == expected);
+}
+
 TEST_CASE("Test insert/remove/iterator") {
     RandomizedCollection rc;
     CHECK(rc.capacity() == 0);
     CHECK(rc.size() == 0);
     CHECK(rc.begin() == rc.end());
     unordered_multiset<int> expected = {};
-    CHECK(rc.to_multi_set() == expected);
+    CHECK(rc.to_multiset() == expected);
 
     CHECK(rc.insert(1));
     CHECK(rc.capacity() >= 1);
@@ -335,19 +353,19 @@ TEST_CASE("Test insert/remove/iterator") {
     CHECK(++rc.begin() != rc.end());
     CHECK(++++rc.begin() == rc.end());
     expected = { 1, 2 };
-    CHECK(rc.to_multi_set() == expected);
+    CHECK(rc.to_multiset() == expected);
 
     CHECK_FALSE(rc.insert(1));
     CHECK(rc.capacity() >= 3);
     CHECK(rc.size() == 3);
     expected = { 1, 1, 2 };
-    CHECK(rc.to_multi_set() == expected);
+    CHECK(rc.to_multiset() == expected);
 
     CHECK(rc.insert(3));
     CHECK(rc.insert(4));
     CHECK(rc.size() == 5);
     expected = { 1, 1, 2, 3, 4 };
-    CHECK(rc.to_multi_set() == expected);
+    CHECK(rc.to_multiset() == expected);
 
     // test removal
     CHECK_FALSE(rc.remove(5));
@@ -356,11 +374,11 @@ TEST_CASE("Test insert/remove/iterator") {
     CHECK(rc.remove(3));
     CHECK(rc.size() == 4);
     expected = { 1, 1, 2, 4 };
-    CHECK(rc.to_multi_set() == expected);
+    CHECK(rc.to_multiset() == expected);
 
     CHECK(rc.remove(1));
     expected = { 1, 2, 4 };
-    CHECK(rc.to_multi_set() == expected);
+    CHECK(rc.to_multiset() == expected);
 }
 
 TEST_CASE("Random test insert/remove") {
@@ -392,7 +410,7 @@ TEST_CASE("Random test insert/remove") {
         }
 
         CAPTURE(round);
-        CHECK(rc.to_multi_set() == expected);
+        CHECK(rc.to_multiset() == expected);
     }
 }
 
