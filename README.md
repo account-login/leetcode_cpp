@@ -95,4 +95,5 @@ Solutions for leetcode using c++11.
 | [133. Clone Graph](<https://leetcode.com/problems/clone-graph/>)                                                                         | [clone_graph](<src/clone_graph.cpp>)             |  69ms |   88% |
 | [381. Insert Delete GetRandom O(1) - Duplicates allowed](<https://leetcode.com/problems/insert-delete-getrandom-o1-duplicates-allowed/>) | [hash_dup](<src/hash_dup.cpp>)                   |  99ms |   62% |
 | [210. Course Schedule II](<https://leetcode.com/problems/course-schedule-ii/>)                                                           | [course_ii](<src/course_ii.cpp>)                 |  23ms |   82% |
+| [45. Jump Game II](<https://leetcode.com/problems/jump-game-ii/>)                                                                        | [jump_ii](<src/jump_ii.cpp>)                     |  15ms |   52% |
 
