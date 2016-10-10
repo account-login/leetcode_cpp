@@ -68,7 +68,7 @@ Solutions for leetcode using c++11.
 | [307. Range Sum Query - Mutable](<https://leetcode.com/problems/range-sum-query-mutable/>)                                               | [range_sum_mut](<src/range_sum_mut.cpp>)         |  52ms |   63% |
 | [179. Largest Number](<https://leetcode.com/problems/largest-number/>)                                                                   | [largest_num](<src/largest_num.cpp>)             |   3ms |   94% |
 | [211. Add and Search Word - Data structure design](<https://leetcode.com/problems/add-and-search-word-data-structure-design/>)           | [add_n_search](<src/add_n_search.cpp>)           |  69ms |   96% |
-| [98. Validate Binary Search Tree](<https://leetcode.com/problems/validate-binary-search-tree/>)                                          | [valid_bst](<src/valid_bst.cpp>)                 |  19ms |   12% |
+| [98. Validate Binary Search Tree](<https://leetcode.com/problems/validate-binary-search-tree/>)                                          | [valid_bst](<src/valid_bst.cpp>)                 |  13ms |   40% |
 | [189. Rotate Array](<https://leetcode.com/problems/rotate-array/>)                                                                       | [rotate_array](<src/rotate_array.cpp>)           |  26ms |   31% |
 | [32. Longest Valid Parentheses](<https://leetcode.com/problems/longest-valid-parentheses/>)                                              | [longest_par](<src/longest_par.cpp>)             |  12ms |   22% |
 | [304. Range Sum Query 2D - Immutable](<https://leetcode.com/problems/range-sum-query-2d-immutable/>)                                     | [range_sum_2d_immu](<src/range_sum_2d_immu.cpp>) |  23ms |   47% |

@@ -27,13 +27,14 @@ using namespace std;
  */
 class Solution {
 public:
-    long long prev = numeric_limits<long long>::min();
+    int prev;
+    bool first;
 
     bool isValidBST(const TreeNode *root) {
         if (!root) {
             return true;
         }
-        this->prev = numeric_limits<long long>::min();
+        this->first = true;
         return travel(root);
     }
 
@@ -45,10 +46,11 @@ public:
             }
         }
 
-        if ((long long)root->val <= this->prev) {
+        if (!this->first && root->val <= this->prev) {
             return false;
         }
         this->prev = root->val;
+        this->first = false;
 
         if (root->right) {
             bool ret = travel(root->right);
