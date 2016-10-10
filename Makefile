@@ -12,7 +12,7 @@ LEETCODES = perm_seq word_ladder_ii max_points lru_cache div_int frac2dec \
             range_sum_2d_immu regex elim_game wildcard_dp remove_k 4sum parser \
             contain_dup_iii median_stream candy stock_iv interleave \
             tree_path_sum first_missing merge_k max_rect dup_num skyline \
-            simp_path copy_list count_one clone_graph hash_dup
+            simp_path copy_list count_one clone_graph hash_dup course_ii
 
 all: $(LEETCODES)
 
