@@ -20,34 +20,39 @@ using namespace std;
 class Solution {
 public:
     void reverseWords(string &s) {
-        reverse(s.begin(), s.end());
+        char *str = (char *)s.data();
+        int len = s.size();
 
-        auto begin = s.begin();
-        while (begin < s.end()) {
-            auto end = begin + 1;
-            while (*end != ' ' && *end != '\0') {
-                end++;
-            }
-            reverse(begin, end);
-            begin = end + 1;
+        // reverse all
+        for (int j = 0; j < len / 2; j++) {
+            swap(str[j], str[len - j - 1]);
         }
 
-        auto src = s.begin();
-        auto dst = s.begin();
-        while (true) {
-            if (*src == '\0') {
-                s.resize(dst - s.begin());
-                return;
+        // reverse word
+        for (int i = 0, begin = 0; i < len + 1; i++) {
+            if (str[i] == ' ' || str[i] == '\0') {
+                for (int j = 0; j < (i - begin) / 2; j++) {
+                    swap(str[begin + j], str[i - j - 1]);
+                }
+                begin = i + 1;
             }
+        }
 
-            if (src[0] == ' ' && (src[1] == ' ' || src[1] == '\0' || dst == s.begin())) {
+        // remove space
+        int src = 0;
+        int dst = 0;
+        while (str[src] != '\0') {
+            if (str[src] == ' ' && (str[src + 1] == ' ' || str[src + 1] == '\0' || dst == 0)) {
                 src++;
             } else {
-                *dst = *src;
+                str[dst] = str[src];
                 dst++;
                 src++;
             }
         }
+
+        // return
+        s.resize(dst);
     }
 
     string reversed(string s) {
