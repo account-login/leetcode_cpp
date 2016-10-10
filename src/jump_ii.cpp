@@ -19,14 +19,8 @@ using namespace std;
 class Solution {
 public:
     int jump(const vector<int> &nums) {
-        if (nums.size() <= 1) {
-            return 0;
-        }
-
         int ans = 0;
-        int start = 0;
-        int end = 1;
-        while (end < nums.size()) {
+        for (int start = 0, end = 1; end < nums.size(); ) {
             int new_end = end;
             for (int i = start; i < end; i++) {
                 if (nums[i] + i + 1 > new_end) {
@@ -54,7 +48,7 @@ TEST_CASE("45. Jump Game II") {
     CHECK(s.jump({ 1, 1, 1, 1, 1, 1 }) == 5);
 
     vector<int> nums;
-    int N = 10000;
+    int N = 100000;
     for (int i = 0; i < N; i++) {
         nums.push_back(10);
     }
