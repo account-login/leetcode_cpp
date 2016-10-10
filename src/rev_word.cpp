@@ -21,7 +21,22 @@ class Solution {
 public:
     void reverseWords(string &s) {
         char *str = (char *)s.data();
-        int len = s.size();
+
+        // remove extra spaces
+        int src = 0;
+        int dst = 0;
+        while (str[src] != '\0') {
+            if (str[src] == ' ' && (str[src + 1] == ' ' || str[src + 1] == '\0' || dst == 0)) {
+                src++;
+            } else {
+                str[dst] = str[src];
+                dst++;
+                src++;
+            }
+        }
+        s.resize(dst);
+        str = (char *)s.data();
+        int len = dst;
 
         // reverse all
         for (int j = 0; j < len / 2; j++) {
@@ -37,22 +52,6 @@ public:
                 begin = i + 1;
             }
         }
-
-        // remove space
-        int src = 0;
-        int dst = 0;
-        while (str[src] != '\0') {
-            if (str[src] == ' ' && (str[src + 1] == ' ' || str[src + 1] == '\0' || dst == 0)) {
-                src++;
-            } else {
-                str[dst] = str[src];
-                dst++;
-                src++;
-            }
-        }
-
-        // return
-        s.resize(dst);
     }
 
     string reversed(string s) {
