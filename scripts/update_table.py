@@ -2,7 +2,6 @@
 
 
 import re
-from pprint import pprint
 
 
 def is_fullwidth(char):
@@ -81,6 +80,7 @@ def read_leetcodes():
     leetcodes = []
     with open('Makefile', 'rt') as f:
         started = False
+        line = None
         while True:
             if started:
                 if line.endswith('\\'):
@@ -120,11 +120,11 @@ def make_table(leetcodes):
             for line in f:
                 # first url
                 if not url:
-                    res = re.match('.*(https://leetcode\.com/problems/\S+).*', line)
+                    res = re.match(r'.*(https://leetcode\.com/problems/\S+).*', line)
                     if res:
                         url = res.group(1)
                 # last TEST_CASE
-                res = re.match('\s*TEST_CASE\(\s*"([^"]+)"\s*\).*', line)
+                res = re.match(r'\s*TEST_CASE\(\s*"([^"]+)"\s*\).*', line)
                 if res:
                     title = res.group(1)
         assert url
@@ -142,6 +142,7 @@ def read_table_lines():
         status = None
         start_no = None
         end_no = None
+        line_no = 0
         for line_no, line in enumerate(f):
             line = line.strip()
             if status is None:

@@ -1,7 +1,6 @@
 import re
-from datetime import datetime
 from collections import defaultdict
-import git
+# import git
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
@@ -15,7 +14,7 @@ class ProblemEntries(defaultdict):
         probs = cls()
 
         for commit in repo.iter_commits():
-            matched = re.match('^\[(\w+)\]', commit.message)
+            matched = re.match(r'^\[(\w+)\]', commit.message)
             if matched:
                 code_name = matched.group(1)
                 entry = probs[code_name]
@@ -59,7 +58,7 @@ class ProblemEntries(defaultdict):
         }
 
     @classmethod
-    def plot_date(self, dct):
+    def plot_date(cls, dct):
         x = list(dct.keys())
         y = list(dct.values())
 
