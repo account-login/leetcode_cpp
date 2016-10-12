@@ -21,10 +21,8 @@ public:
     string word;
     unordered_set<Node *> links;
 
-    Node(string word) : word(word), links()
-    {
-        //
-    }
+    explicit Node(const string &word) : word(word), links()
+    {}
 };
 
 

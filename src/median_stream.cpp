@@ -52,14 +52,14 @@ public:
         if (this->pos != 0) {
             this->pos--;
         } else {
-            this->mid--;
+            --this->mid;
             this->pos = this->mid->second - 1;
         }
     }
 
     inline void pointer_forward() {
         if (this->pos == this->mid->second - 1) {
-            this->mid++;
+            ++this->mid;
             this->pos = 0;
         } else {
             this->pos++;

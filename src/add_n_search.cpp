@@ -20,7 +20,7 @@ struct Trie {
     bool is_end = false;
     Trie *children[26] = {};
 
-    Trie(char ch) : ch(ch) {}
+    explicit Trie(char ch) : ch(ch) {}
 
     ~Trie() {
         for (Trie *p : children) {
@@ -41,6 +41,8 @@ public:
     ~WordDictionary() {
         delete root;
     }
+
+    WordDictionary(const WordDictionary &dct) = delete;
 
     // Adds a word into the data structure.
     void addWord(const string &word) {
@@ -113,7 +115,7 @@ public:
 
 #ifdef RUN_TEST
 TEST_CASE("211. Add and Search Word - Data structure design") {
-    auto dict = WordDictionary();
+    WordDictionary dict;
 
     // test addWord()
     dict.addWord("a");

@@ -30,7 +30,7 @@ public:
     list<int> order;
     unordered_map<int, ValueWrapper> content;
 
-    LRUCache(int capacity) {
+    explicit LRUCache(int capacity) {
         this->capacity = capacity;
     }
 

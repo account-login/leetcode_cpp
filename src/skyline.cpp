@@ -20,7 +20,7 @@ struct Building {
     int right;
     int height;
 
-    Building(const vector<int> &triplet)
+    explicit Building(const vector<int> &triplet)
         : left(triplet[0]), right(triplet[1]), height(triplet[2])
     {}
 

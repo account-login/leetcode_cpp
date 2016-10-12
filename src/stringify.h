@@ -5,9 +5,6 @@
 #include <unordered_set>
 
 
-//#define _DEFINE_CONT_OP()
-
-
 namespace std {
     template<class T1, class T2>
     std::ostream &operator << (std::ostream& os, const pair<T1, T2> &value) {

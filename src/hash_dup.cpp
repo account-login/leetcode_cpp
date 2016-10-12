@@ -82,7 +82,7 @@ public:
             : rc(rc), index(index)
         {}
 
-         // Pre-increment
+        // Pre-increment
         iterator &operator++ () {
             assert(this->index < this->rc.capacity() && "WTF");
 
@@ -121,8 +121,8 @@ public:
             return this->rc.values[this->index];
         }
 
-        const ElemType &operator->() const {
-            return this->operator *();
+        const ElemType *operator->() const {
+            return &this->operator *();
         }
 
         friend ostream &operator << ( ostream &os, const iterator &it ) {

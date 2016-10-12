@@ -29,10 +29,9 @@ public:
         for (int x1 = 0; x1 < xlen; x1++) {
             vector<char> dp(ylen, true);
 
-            bool rect_found;
             for (int x2 = x1; x2 < xlen; x2++) {
                 int y_begin = -1;
-                rect_found = false;
+                bool rect_found = false;
                 for (int y = 0; y < ylen; y++) {
                     dp[y] = dp[y] && (matrix[x2][y] == '1');
 

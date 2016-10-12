@@ -42,7 +42,7 @@ public:
     const Point *p2;
     int count;
 
-    Line(const Point &p1) {
+    explicit Line(const Point &p1) {
         this->count = 1;
         this->p1 = &p1;
         this->p2 = nullptr;

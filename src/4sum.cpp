@@ -50,16 +50,16 @@ public:
                 vector<int> v = { end[-1], begin[0] };
                 found(move(v));
 
-                begin++;
+                ++begin;
                 // ensure no duplicates
                 while (begin[0] == begin[-1] && begin < end - 1) {
-                    begin++;
+                    ++begin;
                 }
-                end--;
+                --end;
             } else if (sum > target) {
-                end--;
+                --end;
             } else {    // sum < target
-                begin++;
+                ++begin;
             }
         }
     }
@@ -82,13 +82,13 @@ public:
             while (begin <= end - n) {
                 // maximum end optimization
                 if (accumulate(begin, begin + n - 1, 0) + end[-1] > target) {
-                    end--;
+                    --end;
                     continue;
                 }
 
                 // minimum begin optimiaztion
                 if (begin[0] + accumulate(end - n + 1, end, 0) < target) {
-                    begin++;
+                    ++begin;
                     continue;
                 }
 
@@ -100,10 +100,10 @@ public:
 
                 nSum_sorted(begin + 1, end, n - 1, target - num, sub_found);
 
-                begin++;
+                ++begin;
                 // ensure no duplicates
                 while (begin[0] == begin[-1] && begin <= end - n) {
-                    begin++;
+                    ++begin;
                 }
             }
         }
