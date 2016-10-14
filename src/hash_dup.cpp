@@ -559,6 +559,17 @@ TEST_CASE("Performance test") {
     INFO("STL lookup " << INSERT_N << " ints, cost " << diff.count() << "s.");
     CHECK(count_found == INSERT_N);
 
+    // HashMultiSetOpenAddress lookup
+    count_found = 0;
+    start = chrono::steady_clock::now();
+    for (int i : to_insert) {
+        count_found += (msoa.find(i) != msoa.end());
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("XXX lookup " << INSERT_N << " ints, cost " << diff.count() << "s.");
+    CHECK(count_found == INSERT_N);
+
     // stl lookup non-exist
     count_found = 0;
     start = chrono::steady_clock::now();
@@ -568,6 +579,17 @@ TEST_CASE("Performance test") {
     end = chrono::steady_clock::now();
     diff = end - start;
     INFO("STL lookup " << INSERT_N << " non-exist ints, cost " << diff.count() << "s.");
+    CHECK(count_found == 0);
+
+    // HashMultiSetOpenAddress lookup non-exist
+    count_found = 0;
+    start = chrono::steady_clock::now();
+    for (int i : to_lookup_non_exist) {
+        count_found += (msoa.find(i) != msoa.end());
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("XXX lookup " << INSERT_N << " non-exist ints, cost " << diff.count() << "s.");
     CHECK(count_found == 0);
 
     // stl remove
