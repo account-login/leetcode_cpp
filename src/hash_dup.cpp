@@ -2,6 +2,7 @@
 #include <iterator>
 #include <functional>
 #include <random>
+#include <numeric>
 #include <algorithm>
 #include <limits>
 #include <cmath>
@@ -409,6 +410,34 @@ TEST_CASE("Random test insert/remove") {
     }
 }
 
+template<class ElemType>
+double length(const vector<ElemType> &v) {
+    return sqrt(accumulate(v.begin(), v.end(), 0.0, [](const ElemType &sum, const ElemType &d) {
+        return sum + d * d;
+    }));
+}
+
+template<class ElemType1, class ElemType2, class ResultType = decltype(ElemType1() - ElemType2())>
+double distance(const vector<ElemType1> &v1, const vector<ElemType2> &v2) {
+    assert(v1.size() == v2.size());
+    vector<ResultType> sub;
+    for (int i = 0; i < v1.size(); i++) {
+        sub.push_back(v1[i] - v2[i]);
+    }
+    return length(sub);
+}
+
+template<class ElemType, class ResultType = decltype(ElemType() / double(1))>
+vector<ResultType> normalized(const vector<ElemType> &v1) {
+    vector<ResultType> ans;
+    double len = length(v1);
+    for (ElemType d : v1) {
+        ans.push_back(d / len);
+    }
+    assert(length(ans) == Approx(1.0));
+    return ans;
+}
+
 TEST_CASE("Test getRandom() distribution") {
     auto test_dist = [](
         const vector<int> &freqs,
@@ -435,25 +464,6 @@ TEST_CASE("Test getRandom() distribution") {
         return stats;
     };
 
-    auto distance = [](const vector<double> &v1, const vector<double> &v2) {
-        assert(v1.size() == v2.size());
-        vector<double> sub;
-        for (int i = 0; i < v1.size(); i++) {
-            sub.push_back(v1[i] - v2[i]);
-        }
-        transform(sub.begin(), sub.end(), sub.begin(), [](double i) { return i * i; });
-        return sqrt(accumulate(sub.begin(), sub.end(), 0.0L));
-    };
-
-    auto normalize = [](const vector<int> &v1) {
-        vector<double> ans;
-        double sum = accumulate(v1.begin(), v1.end(), 0.0L);
-        for (int i = 0; i < v1.size(); i++) {
-            ans.push_back(v1[i] / sum);
-        }
-        return ans;
-    };
-
     auto test = [&](
         const vector<int> &freqs,
         int insert_round = 100,
@@ -461,10 +471,10 @@ TEST_CASE("Test getRandom() distribution") {
     {
         vector<double> stats = test_dist(freqs);
         CAPTURE(stats);
-        CHECK(distance(stats, normalize(freqs)) < 0.05);
+        CHECK(distance(normalized(stats), normalized(freqs)) < 0.04);
     };
 
-    test({ 1 }, 1, 100000);
+    test({ 1 }, 1);
     test({ 1, 1 });
     test({ 1, 2 });
     test({ 2, 1 }, 1);
