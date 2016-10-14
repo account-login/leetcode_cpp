@@ -110,7 +110,8 @@ public:
 
         // two-way comparison: v.begin() == v.cbegin() and vice versa
         bool operator == (const iterator &rhs) const {
-            return &this->rc == &rhs.rc && this->index == rhs.index;
+            assert(&this->rc == &rhs.rc);
+            return this->index == rhs.index;
         }
 
         bool operator != (const iterator &rhs) const {
@@ -278,6 +279,20 @@ public:
         assert(false);
     }
 
+    iterator find(const ElemType &val) const {
+        size_t h = this->_hash_fn(val) % this->capacity();
+        while (this->flags[h]) {
+            if (this->values[h] == val) {
+                return iterator(*this, h);
+            }
+
+            h++;
+            h %= this->capacity();
+        }
+
+        return this->end();
+    }
+
 #ifdef RUN_TEST
     unordered_multiset<ElemType> to_multiset() const {
         unordered_multiset<ElemType> ans(this->begin(), this->end());
@@ -321,7 +336,7 @@ TEST_CASE("Test on types other than int") {
     CHECK(mset.to_multiset() == expected);
 }
 
-TEST_CASE("Test insert/remove/iterator") {
+TEST_CASE("Test insert/remove/find/iterator") {
     RandomizedCollection rc;
     CHECK(rc.capacity() == 0);
     CHECK(rc.size() == 0);
@@ -363,6 +378,12 @@ TEST_CASE("Test insert/remove/iterator") {
     CHECK(rc.size() == 5);
     expected = { 1, 1, 2, 3, 4 };
     CHECK(rc.to_multiset() == expected);
+
+    // test find
+    CHECK(rc.find(1) != rc.end());
+    CHECK(*rc.find(1) == 1);
+    CHECK(*rc.find(2) == 2);
+    CHECK(rc.find(5) == rc.end());
 
     // test removal
     CHECK_FALSE(rc.remove(5));
