@@ -2,6 +2,7 @@
 #include <iterator>
 #include <functional>
 #include <random>
+#include <chrono>
 #include <numeric>
 #include <algorithm>
 #include <limits>
@@ -479,6 +480,94 @@ TEST_CASE("Test getRandom() distribution") {
     test({ 1, 2 });
     test({ 2, 1 }, 1);
     test({ 2, 1, 2, 1, 2, 1, 0, 5 });
+}
+
+TEST_CASE("Performance test") {
+    uniform_int_distribution<int> elem_gen(0, numeric_limits<int>::max());
+    random_device rd;
+
+    const int INSERT_N = 1000000;
+    vector<int> to_insert;
+    for (int i = 0; i < INSERT_N; i++) {
+        to_insert.push_back(elem_gen(rd));
+    }
+
+    const int REMOVE_N = 100000;
+    vector<int> to_remove_non_exist;
+    uniform_int_distribution<int> rm_gen(numeric_limits<int>::min(), -1);
+    for (int i = 0; i < REMOVE_N; i++) {
+        to_remove_non_exist.push_back(rm_gen(rd));
+    }
+
+    uniform_int_distribution<int> pos_gen(0, INSERT_N - 1);
+    vector<int> to_remove_exist(to_insert.begin(), to_insert.begin() + REMOVE_N);
+    random_shuffle(to_insert.begin(), to_insert.end());
+
+    vector<int> to_lookup_non_exist(to_remove_non_exist);
+
+    // stl insert
+    unordered_multiset<int> stl;
+    auto start = chrono::steady_clock::now();
+    for (int i : to_insert) {
+        stl.insert(i);
+    }
+    auto end = chrono::steady_clock::now();
+    chrono::duration<double> diff = end - start;
+    INFO("STL insert " << INSERT_N << " ints, cost " << diff.count() << "s.");
+
+    // HashMultiSetOpenAddress insert
+    HashMultiSetOpenAddress<int> msoa;
+    start = chrono::steady_clock::now();
+    for (int i : to_insert) {
+        msoa.insert(i);
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("XXX insert " << INSERT_N << " ints, cost " << diff.count() << "s.");
+
+    CHECK(true);
+
+    // stl lookup
+    int count_found = 0;
+    start = chrono::steady_clock::now();
+    for (int i : to_insert) {
+        count_found += (stl.find(i) != stl.end());
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("STL lookup " << INSERT_N << " ints, cost " << diff.count() << "s.");
+    CHECK(count_found == INSERT_N);
+
+    // stl lookup non-exist
+    count_found = 0;
+    start = chrono::steady_clock::now();
+    for (int i : to_lookup_non_exist) {
+        count_found += (stl.find(i) != stl.end());
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("STL lookup " << INSERT_N << " non-exist ints, cost " << diff.count() << "s.");
+    CHECK(count_found == 0);
+
+    // stl remove
+    start = chrono::steady_clock::now();
+    for (int i : to_remove_exist) {
+        stl.erase(stl.find(i));
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("STL remove " << REMOVE_N << " ints, cost " << diff.count() << "s.");
+
+    // HashMultiSetOpenAddress remove
+    int remove_count = 0;
+    start = chrono::steady_clock::now();
+    for (int i : to_remove_exist) {
+        remove_count += !!msoa.remove(i);
+    }
+    end = chrono::steady_clock::now();
+    diff = end - start;
+    INFO("XXX remove " << REMOVE_N << " ints, cost " << diff.count() << "s.");
+    CHECK(remove_count == REMOVE_N);
 }
 
 TEST_CASE("381. Insert Delete GetRandom O(1) - Duplicates allowed") {
