@@ -280,14 +280,16 @@ public:
     }
 
     iterator find(const ElemType &val) const {
+        int count = 0;
         size_t h = this->_hash_fn(val) % this->capacity();
-        while (this->flags[h]) {
+        while (count < this->capacity() && this->flags[h]) {
             if (this->values[h] == val) {
                 return iterator(*this, h);
             }
 
             h++;
             h %= this->capacity();
+            count++;
         }
 
         return this->end();
@@ -350,6 +352,8 @@ TEST_CASE("Test insert/remove/find/iterator") {
     CHECK(rc.begin() != rc.end());
     CHECK(++rc.begin() == rc.end());
     CHECK(*rc.begin() == 1);
+    CHECK(rc.find(0) == rc.end());
+    CHECK(*rc.find(1) == 1);
 
     // test iterator copy & assign
     auto it = rc.begin();
