@@ -2,6 +2,7 @@
 #define STRINGIFY_H
 
 #include <iostream>
+#include <vector>
 #include <unordered_set>
 
 
