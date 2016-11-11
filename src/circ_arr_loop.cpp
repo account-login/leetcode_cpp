@@ -19,35 +19,59 @@ using namespace std;
 
 class Solution {
 public:
-    bool circularArrayLoop(const vector<int> &nums) {
+    bool circularArrayLoop(vector<int> &nums) {
         int len = nums.size();
         for (int i = 0; i < len; i++) {
-            if (check_loop(nums, i)) {
-                return true;
+            // skip visited nums, O(n)
+            if (nums[i] != 0) {
+                if (check_loop(nums, i)) {
+                    return true;
+                } else {
+                    mark_dead(nums, i);
+                }
             }
         }
 
         return false;
     }
 
-    bool check_loop(const vector<int> &nums, int pos) {
+    bool check_loop(vector<int> &nums, int pos) {
         bool forward = (nums[pos] > 0);
         int len = nums.size();
         for (int i = 0; i < len; i++) {
             if (nums[pos] % len == 0) {
-                return false;   // jump to itself
+                return false;               // jump to itself
             } else {
                 int shift = nums[pos];
                 if ((shift > 0) != forward) {
-                    return false;   // direction changed
+                    return false;           // direction changed
                 }
                 pos += (shift % len) + len;
                 pos %= len;
             }
         }
         // not exited within `len` step, a loop.
-
         return true;
+    }
+
+    void mark_dead(vector<int> &nums, int pos) {
+        bool forward = (nums[pos] > 0);
+        int len = nums.size();
+        while (true) {
+            if (nums[pos] % len == 0) {
+                nums[pos] = 0;      // mark
+                return;             // jump to itself
+            } else {
+                int shift = nums[pos];
+                if ((shift > 0) != forward) {
+                    return;         // direction changed
+                } else {
+                    nums[pos] = 0;  // mark
+                }
+                pos += (shift % len) + len;
+                pos %= len;
+            }
+        }
     }
 
     bool solve(vector<int> nums) {
@@ -71,5 +95,25 @@ TEST_CASE("457. Circular Array Loop") {
     CHECK_FALSE(s.solve({123}));
     CHECK_FALSE(s.solve({5, -3}));
     CHECK_FALSE(s.solve({5, -27}));
+
+    vector<int> vec;
+    int N = 1000000;
+    for (int i = 0; i < N; i++) {
+        if (i % 50 == 0) {
+            vec.push_back(-49);
+        } else {
+            vec.push_back(1);
+        }
+    }
+
+    CHECK_FALSE(s.solve(vec));
+
+    vec.clear();
+    for (int i = 0; i < N; i++) {
+        vec.push_back(1);
+    }
+    vec.push_back(-1);
+
+    CHECK_FALSE(s.solve(vec));
 }
 #endif
