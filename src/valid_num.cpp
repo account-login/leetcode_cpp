@@ -10,6 +10,15 @@
 #endif
 #include <cassert>
 
+// select an implementation
+#ifdef ALGO_FA
+#   undef ALGO_REC
+#   define isNumber_fa isNumber
+#else
+#   define ALGO_REC
+#   undef ALGO_FA
+#   define isNumber_rec isNumber
+#endif
 // https://leetcode.com/problems/valid-number/
 
 
@@ -18,7 +27,7 @@ using namespace std;
 
 class Solution {
 public:
-    bool isNumber(string s) {
+    bool isNumber_rec(const string &s) {
         const char *str = s.data();
         // leading spaces
         while (isspace(str[0])) {
@@ -123,6 +132,117 @@ public:
 
         return str - origin_str;
     }
+
+    bool isNumber_fa(const string &s) {
+        enum class ST {
+            BEGIN,              // 0
+            SIGNED,             // 1
+            HAS_DIGIT,          // 2
+            DOTTED,             // 3
+            DOTTED_NEED_DIGIT,  // 4
+            EXP_BEGIN,          // 5
+            EXP_SIGNED,         // 6
+            EXP_HAS_DIGIT,      // 7
+            PRE_END             // 8
+        };
+
+        ST st = ST::BEGIN;
+        for (const char *p = s.data(); ; p++) {
+            char ch = *p;
+            if (st == ST::BEGIN) {                      // 0
+                if (ch == '\0') {
+                    return false;
+                } else if (isspace(ch)) {
+                    // pass
+                } else if (ch == '.') {
+                    st = ST::DOTTED_NEED_DIGIT;
+                } else if (ch == '+' || ch == '-') {
+                    st = ST::SIGNED;
+                } else if (isdigit(ch)) {
+                    st = ST::HAS_DIGIT;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::SIGNED) {              // 1
+                if (isdigit(ch)) {
+                    st = ST::HAS_DIGIT;
+                } else if (ch == '.') {
+                    st = ST::DOTTED_NEED_DIGIT;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::HAS_DIGIT) {           // 2
+                if (isdigit(ch)) {
+                    // pass
+                } else if (ch == '.') {
+                    st = ST::DOTTED;
+                } else if (ch == 'e' || ch == 'E') {
+                    st = ST::EXP_BEGIN;
+                } else if (ch == '\0') {
+                    return true;
+                } else if (isspace(ch)) {
+                    st = ST::PRE_END;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::DOTTED) {              // 3
+                if (isdigit(ch)) {
+                    // pass
+                } else if (ch == 'e' || ch == 'E') {
+                    st = ST::EXP_BEGIN;
+                } else if (ch == '\0') {
+                    return true;
+                } else if (isspace(ch)) {
+                    st = ST::PRE_END;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::DOTTED_NEED_DIGIT) {   // 4
+                if (isdigit((ch))) {
+                    st = ST::DOTTED;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::EXP_BEGIN) {           // 5
+                if (ch == '+' || ch == '-') {
+                    st = ST::EXP_SIGNED;
+                } else if (isdigit(ch)) {
+                    st = ST::EXP_HAS_DIGIT;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::EXP_SIGNED) {          // 6
+                if (isdigit(ch)) {
+                    st = ST::EXP_HAS_DIGIT;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::EXP_HAS_DIGIT) {       // 7
+                if (isdigit(ch)) {
+                    // pass
+                } else if (ch == '\0') {
+                    return true;
+                } else if (isspace(ch)) {
+                    st = ST::PRE_END;
+                } else {
+                    return false;
+                }
+            } else if (st == ST::PRE_END) {             // 8
+                if (ch == '\0') {
+                    return true;
+                } else if (isspace(ch)) {
+                    // pass
+                } else {
+                    return false;
+                }
+            } else {
+                assert(false);
+            }
+
+        }
+
+        assert(false);
+    }
 };
 
 
@@ -147,6 +267,7 @@ public:
 
 // [sign]?0x[digit]+
 
+#ifdef ALGO_REC
 TEST_CASE("Valid decimal integer") {
     Solution s;
 
@@ -179,6 +300,7 @@ TEST_CASE("Valid float") {
     CHECK(s.scan_sci_float("234") == 3);
     CHECK(s.scan_sci_float("1.23e-") == 0);
 }
+#endif  // ALGO_REC
 
 TEST_CASE("65. Valid Number") {
     Solution s;
@@ -190,6 +312,24 @@ TEST_CASE("65. Valid Number") {
 
     CHECK(s.isNumber(" 123 ") == true);
     CHECK(s.isNumber("+1.123e-100  ") == true);
+
+    CHECK(s.isNumber("0") == true);
+    CHECK(s.isNumber("+0") == true);
+    CHECK(s.isNumber(".0") == true);
+    CHECK(s.isNumber("0.") == true);
+    CHECK(s.isNumber("0.0") == true);
+    CHECK(s.isNumber("+.0") == true);
+    CHECK(s.isNumber(".") == false);
+    CHECK(s.isNumber("+.") == false);
+    CHECK(s.isNumber("0.E1") == true);
+    CHECK(s.isNumber(".0E1") == true);
+    CHECK(s.isNumber(".E1") == false);
+    CHECK(s.isNumber("0E0") == true);
+    CHECK(s.isNumber("0E") == false);
+    CHECK(s.isNumber("0E+") == false);
+    CHECK(s.isNumber("0E+0") == true);
+    CHECK(s.isNumber("0E+.1") == false);
+    CHECK(s.isNumber("E0") == false);
 }
 #endif
 
