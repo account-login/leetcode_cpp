@@ -238,7 +238,6 @@ public:
             } else {
                 assert(false);
             }
-
         }
 
         assert(false);
@@ -315,8 +314,12 @@ TEST_CASE("65. Valid Number") {
 
     CHECK(s.isNumber("0") == true);
     CHECK(s.isNumber("+0") == true);
+    CHECK(s.isNumber("+") == false);
     CHECK(s.isNumber(".0") == true);
     CHECK(s.isNumber("0.") == true);
+    CHECK(s.isNumber("0. ") == true);
+    CHECK(s.isNumber("0.E") == false);
+    CHECK(s.isNumber("0.+") == false);
     CHECK(s.isNumber("0.0") == true);
     CHECK(s.isNumber("+.0") == true);
     CHECK(s.isNumber(".") == false);
@@ -325,6 +328,7 @@ TEST_CASE("65. Valid Number") {
     CHECK(s.isNumber(".0E1") == true);
     CHECK(s.isNumber(".E1") == false);
     CHECK(s.isNumber("0E0") == true);
+    CHECK(s.isNumber("0E0.") == false);
     CHECK(s.isNumber("0E") == false);
     CHECK(s.isNumber("0E+") == false);
     CHECK(s.isNumber("0E+0") == true);
