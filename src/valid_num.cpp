@@ -11,13 +11,13 @@
 #include <cassert>
 
 // select an implementation
-#ifdef ALGO_FA
-#   undef ALGO_REC
-#   define isNumber_fa isNumber
-#else
-#   define ALGO_REC
+#ifdef ALGO_REC
 #   undef ALGO_FA
 #   define isNumber_rec isNumber
+#else
+#   define ALGO_FA
+#   undef ALGO_REC
+#   define isNumber_fa isNumber
 #endif
 // https://leetcode.com/problems/valid-number/
 

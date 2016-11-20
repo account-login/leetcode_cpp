@@ -50,7 +50,7 @@ Solutions for leetcode using c++11.
 | [166. Fraction to Recurring Decimal](<https://leetcode.com/problems/fraction-to-recurring-decimal/>)                                     | [frac2dec](<src/frac2dec.cpp>)                   |       |       |
 | [44. Wildcard Matching](<https://leetcode.com/problems/wildcard-matching/>)                                                              | [wildcard](<src/wildcard.cpp>)                   |  18ms |   62% |
 | [8. String to Integer (atoi)](<https://leetcode.com/problems/string-to-integer-atoi/>)                                                   | [atoi](<src/atoi.cpp>)                           |       |       |
-| [65. Valid Number](<https://leetcode.com/problems/valid-number/>)                                                                        | [valid_num](<src/valid_num.cpp>)                 |       |       |
+| [65. Valid Number](<https://leetcode.com/problems/valid-number/>)                                                                        | [valid_num](<src/valid_num.cpp>)                 |   3ms |   69% |
 | [4. Median of Two Sorted Arrays](<https://leetcode.com/problems/median-of-two-sorted-arrays/>)                                           | [2array_median](<src/2array_median.cpp>)         |       |       |
 | [212. Word Search II](<https://leetcode.com/problems/word-search-ii/>)                                                                   | [word_search_ii](<src/word_search_ii.cpp>)       |       |       |
 | [91. Decode Ways](<https://leetcode.com/problems/decode-ways/>)                                                                          | [decode_ways](<src/decode_ways.cpp>)             |       |       |
