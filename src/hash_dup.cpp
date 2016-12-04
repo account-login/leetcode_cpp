@@ -203,7 +203,7 @@ public:
         vector<ElemType> new_ctn(new_cap);
         FlagsType new_flags(new_cap);
 
-        for (int i = 0; i < this->capacity(); i++) {
+        for (size_t i = 0; i < this->capacity(); i++) {
             if (this->flags[i]) {
                 this->_insert(new_ctn, new_flags, this->values[i]);
             }
@@ -225,7 +225,7 @@ public:
         bool found = false;
         size_t last_found;
 
-        int count = 0;
+        size_t count = 0;
         size_t h = this->_hash_fn(val);
         h %= this->capacity();
         while (this->flags[h] && count < this->capacity()) {
@@ -248,7 +248,7 @@ public:
             this->flags[last_found] = false;
 
             // rehash next element
-            int count = 0;
+            size_t count = 0;
             for (h = (last_found + 1) % this->capacity();
                  this->flags[h] && count < this->capacity();
                  h = (h + 1) % this->capacity())
@@ -280,7 +280,7 @@ public:
     }
 
     iterator find(const ElemType &val) const {
-        int count = 0;
+        size_t count = 0;
         size_t h = this->_hash_fn(val) % this->capacity();
         while (count < this->capacity() && this->flags[h]) {
             if (this->values[h] == val) {
@@ -447,7 +447,7 @@ template<class ElemType1, class ElemType2, class ResultType = decltype(ElemType1
 double distance(const vector<ElemType1> &v1, const vector<ElemType2> &v2) {
     assert(v1.size() == v2.size());
     vector<ResultType> sub;
-    for (int i = 0; i < v1.size(); i++) {
+    for (size_t i = 0; i < v1.size(); i++) {
         sub.push_back(v1[i] - v2[i]);
     }
     return length(sub);
@@ -473,7 +473,7 @@ TEST_CASE("Test getRandom() distribution") {
         RandomizedCollection rc;
 
         for (int round = 0; round < insert_round; round++) {
-            for (int i = 0; i < freqs.size(); i++) {
+            for (size_t i = 0; i < freqs.size(); i++) {
                 for (int j = 0; j < freqs[i]; j++) {
                     rc.insert(i);
                 }
