@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <tuple>
 #include <cstdint>
+#include <algorithm>
 #include <iostream>
 
 #ifdef RUN_TEST
@@ -33,6 +34,10 @@ bool operator < (const HeapItem &lhs, const HeapItem &rhs) {
     return tie(lhs.freq, lhs.serial) < tie(rhs.freq, rhs.serial);
 }
 
+bool operator > (const HeapItem &lhs, const HeapItem &rhs) {
+    return tie(lhs.freq, lhs.serial) > tie(rhs.freq, rhs.serial);
+}
+
 void swap(HeapItem &lhs, HeapItem &rhs) {
     swap(lhs.freq, rhs.freq);
     swap(lhs.serial, rhs.serial);
@@ -41,7 +46,7 @@ void swap(HeapItem &lhs, HeapItem &rhs) {
 
 namespace std {
     ostream &operator << (ostream& os, const HeapItem &item) {
-        os << "{ key=" << item.key << ", serial=" << item.serial << ", freq=" << item.freq << " }";
+        os << "(" << item.key << ", s=" << item.serial << ", f=" << item.freq << ")";
         return os;
     }
 }
@@ -81,46 +86,54 @@ private:
         assert(this->heap.size() > 0);
 
         size_t index = this->heap.size() - 1;
+        HeapItem item = this->heap[index];
         int parent = heap_parent(index);
-        while (parent >= 0 && this->heap[index] < this->heap[parent]) {
+        while (parent >= 0 && item < this->heap[parent]) {
             this->map.find(this->heap[parent].key)->second.heapidx = index;
-            swap(this->heap[index], this->heap[parent]);
+            this->heap[index] = this->heap[parent];
             index = parent;
             parent = heap_parent(index);
         }
 
+        this->heap[index] = item;
+        assert(is_heap(this->heap.begin(), this->heap.end(), greater<HeapItem>()));
         return index;
     }
 
     void evict() {
         assert(this->heap.size() > 0);
 
+        this->map.erase(this->heap.front().key);
         if (this->heap.size() > 1) {
-            swap(this->heap.front(), this->heap.back());
+            this->heap.front() = this->heap.back();
             this->heap_increased(0, this->heap.size() - 1);
         }
-        this->map.erase(this->heap.back().key);
         this->heap.pop_back();
+        assert(is_heap(this->heap.begin(), this->heap.end(), greater<HeapItem>()));
     }
 
     void heap_increased(size_t index, size_t end) {
         assert(0 < end && end <= this->heap.size());
         assert(index < end);
 
+        this->heap.push_back(this->heap[index]);
         while (true) {
-            size_t minimum = index;
+            size_t minimum = this->heap.size() - 1;
             for (size_t child : { heap_right(index), heap_left(index) }) {
                 if (child < end && this->heap[child] < this->heap[minimum]) {
                     minimum = child;
                 }
             }
 
-            if (minimum != index) {
+            if (minimum != this->heap.size() - 1) {
                 this->map.find(this->heap[minimum].key)->second.heapidx = index;
-                swap(this->heap[index], this->heap[minimum]);
+                this->heap[index] = this->heap[minimum];
                 index = minimum;
             } else {
+                this->heap[index] = this->heap.back();
                 this->map.find(this->heap[index].key)->second.heapidx = index;
+                this->heap.pop_back();
+                assert(is_heap(this->heap.begin(), this->heap.begin() + end, greater<HeapItem>()));
                 return;
             }
         }
