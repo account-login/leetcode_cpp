@@ -54,6 +54,34 @@ namespace std {
         }
         return os;
     }
+
+    string fmt_time(double sec) {
+        char buf[100];
+
+        if (sec >= 10) {
+            sprintf(buf, "%.1f s", sec);
+        } else if (sec >= 1) {
+            sprintf(buf, "%.2f s", sec);
+        } else if (sec >= 0.1) {
+            sprintf(buf, "%.0f ms", sec * 1000);
+        } else if (sec >= 0.01) {
+            sprintf(buf, "%.1f ms", sec * 1000);
+        } else if (sec >= 0.001) {
+            sprintf(buf, "%.2f ms", sec * 1000);
+        } else if (sec >= 0.0001) {
+            sprintf(buf, "%.3f ms", sec * 1000);
+        } else {
+            sprintf(buf, "%.1f us", sec * 1000000);
+        }
+
+        return string(buf);
+    }
+
+    template<typename T>
+    std::ostream &operator << (std::ostream& os, const std::chrono::duration<T> &value) {
+        os << fmt_time(value.count());
+        return os;
+    }
 }
 
 #endif // STRINGIFY_H
