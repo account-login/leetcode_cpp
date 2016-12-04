@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <list>
 #include <unordered_set>
 
 
@@ -20,6 +21,11 @@ namespace std {
     template<class ElemType>
     std::ostream &operator << (std::ostream& os, const vector<ElemType> &value) {
         return print_container(os, value, "vector { ");
+    }
+
+    template<class ElemType>
+    std::ostream &operator << (std::ostream& os, const list<ElemType> &value) {
+        return print_container(os, value, "list { ");
     }
 
     template<typename ContType>

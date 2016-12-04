@@ -98,5 +98,5 @@ Solutions for leetcode using c++11.
 | [45. Jump Game II](<https://leetcode.com/problems/jump-game-ii/>)                                                                        | [jump_ii](<src/jump_ii.cpp>)                     |  12ms |   88% |
 | [151. Reverse Words in a String](<https://leetcode.com/problems/reverse-words-in-a-string/>)                                             | [rev_word](<src/rev_word.cpp>)                   |   6ms |   67% |
 | [457. Circular Array Loop](<https://leetcode.com/problems/circular-array-loop/>)                                                         | [circ_arr_loop](<src/circ_arr_loop.cpp>)         |   0ms |       |
-| [460. LFU Cache](<https://leetcode.com/problems/lfu-cache/>)                                                                             | [lfu_cache](<src/lfu_cache.cpp>)                 | 206ms |   60% |
+| [460. LFU Cache](<https://leetcode.com/problems/lfu-cache/>)                                                                             | [lfu_cache](<src/lfu_cache.cpp>)                 | 179ms |   87% |
 
