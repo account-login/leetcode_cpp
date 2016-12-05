@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <cstring>
 #include <iostream>
 
 #ifdef RUN_TEST
@@ -35,30 +36,31 @@ public:
         int len1 = s1_len * n1;
         vector<int> go_from_s1(s1_len);
 
-        vector<int> next_start(s1_len, -1);
-        int dist_to_start = -1;
-        for (size_t i = 0; i < s1_len; i++) {
-            size_t index = s1_len + start - i;
-            index %= s1_len;
-            if (s1[index] == s2[0]) {
-                dist_to_start = 0;
+        int next_char[s1_len][128];
+        memset(next_char, 0, sizeof(next_char));
+
+        for (char s2_ch : s2) {
+            int dist_to_start = -1;
+            for (int i = s1_len * 2; i >= 0; i--) {
+                size_t index = i % s1_len;
+                if (s1[index] == s2_ch) {
+                    dist_to_start = 0;
+                }
+                if (dist_to_start != -1) {
+                    next_char[index][s2_ch] = dist_to_start;
+                    dist_to_start++;
+                }
             }
-            next_start[index] = dist_to_start;
-            dist_to_start++;
+            if (dist_to_start == -1) {
+                return 0;
+            }
         }
-#ifdef RUN_TEST
-        for (size_t i = 0; i < next_start.size(); i++) {
-            size_t index = i + next_start[i];
-            assert(s1[index % s1_len] != -1);
-            assert(s1[index % s1_len] == s2[0]);
-        }
-#endif
 
         bool has_period = false;
         int cur = start;
         int s2_count = 0;
         while (true) {
-            cur += next_start[cur % s1_len];
+            cur += next_char[cur % s1_len][s2[0]];
 
             if (go_from_s1[cur % s1_len] != 0) {
                 if (!has_period && cur % s1_len == start) {
@@ -75,9 +77,8 @@ public:
             } else {
                 int save_cur = cur;
                 for (char s2_ch : s2) {
-                    while (s1[cur % s1_len] != s2_ch) {
-                        cur++;
-                    }
+                    cur += next_char[cur % s1_len][s2_ch];
+                    assert(s1[cur % s1_len] == s2_ch);
                     cur++;
                 }
 
