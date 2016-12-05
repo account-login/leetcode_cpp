@@ -26,23 +26,38 @@ public:
         assert(n1 >= 0);
         assert(n2 >= 1);
 
-        int len1 = s1.size() * n1;
-        vector<int> go_from_s1(s1.size());
         size_t start = s1.find(s2[0]);
         if (start == string::npos) {
             return 0;
         }
 
+        size_t s1_len = s1.size();
+        int len1 = s1_len * n1;
+        vector<int> go_from_s1(s1_len);
+        vector<int> next_start(s1_len, -1);
+        int dist_to_start = -1;
+        for (int i = s1_len * 2; i >= 0; i--) {
+            if (s1[i % s1_len] == s2[0]) {
+                dist_to_start = 0;
+            }
+            next_start[i % s1_len] = dist_to_start;
+            dist_to_start++;
+        }
+        /*
+        for (int i = 0; i < next_start.size(); i++) {
+            int index = i + next_start[i];
+            assert(s1[index % s1.size()] == s2[0]);
+        }
+        */
+
         bool has_period = false;
         int cur = start;
         int s2_count = 0;
         while (true) {
-            while (s1[cur % s1.size()] != s2[0]) {
-                cur++;
-            }
+            cur += next_start[cur % s1_len];
 
-            if (go_from_s1[cur % s1.size()] != 0) {
-                if (!has_period && cur % s1.size() == start) {
+            if (go_from_s1[cur % s1_len] != 0) {
+                if (!has_period && cur % s1_len == start) {
                     has_period = true;
                     int one_period = cur - start;
                     int periods = (len1 - start) / one_period;
@@ -51,18 +66,18 @@ public:
                     assert(cur <= len1);
                     continue;
                 } else {
-                    cur += go_from_s1[cur % s1.size()];
+                    cur += go_from_s1[cur % s1_len];
                 }
             } else {
                 int save_cur = cur;
                 for (char s2_ch : s2) {
-                    while (s1[cur % s1.size()] != s2_ch) {
+                    while (s1[cur % s1_len] != s2_ch) {
                         cur++;
                     }
                     cur++;
                 }
 
-                go_from_s1[save_cur % s1.size()] = cur - save_cur;
+                go_from_s1[save_cur % s1_len] = cur - save_cur;
             }
 
             if (cur > len1) {
@@ -94,5 +109,14 @@ TEST_CASE("466. Count The Repetitions") {
     CHECK(s.getMaxRepetitions("caca", 4000, "aaaa", 100) == 20);
     CHECK(s.getMaxRepetitions("caca", 4001, "aaaa", 100) == 20);
     CHECK(s.getMaxRepetitions("cacacacacacacaca", 100, "ca", 7) == 8 * 100 / 7);
+
+    CHECK(s.getMaxRepetitions(
+          "phqghumeaylnlfdxfircvscxggbwkfnqduxwfnfozvsrtkjpre"
+          "pggxrpnrvystmwcysyycqpevikeffmznimkkasvwsrenzkycxf",
+          1000000,
+          "xtlsgypsfadpooefxzbcoejuvpvaboygpoeylfpbnpljvrvipy"
+          "amyehwqnqrqpmxujjloovaowuxwhmsncbxcoksfzkvatxdknly",
+          100
+    ) == 303);
 }
 #endif
