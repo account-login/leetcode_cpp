@@ -27,11 +27,6 @@ public:
         assert(n1 >= 0);
         assert(n2 >= 1);
 
-        size_t start = s1.find(s2[0]);
-        if (start == string::npos) {
-            return 0;
-        }
-
         size_t s1_len = s1.size();
         int len1 = s1_len * n1;
         vector<int> go_from_s1(s1_len);
@@ -55,6 +50,8 @@ public:
                 return 0;
             }
         }
+
+        size_t start = next_char[0][s2[0]];
 
         bool has_period = false;
         int cur = start;
