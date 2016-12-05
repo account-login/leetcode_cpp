@@ -2,6 +2,7 @@
 #define STRINGIFY_H
 
 #include <iostream>
+#include <chrono>
 #include <vector>
 #include <list>
 #include <unordered_set>
