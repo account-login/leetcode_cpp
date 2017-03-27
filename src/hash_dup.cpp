@@ -538,8 +538,8 @@ TEST_CASE("Performance test") {
         stl.insert(i);
     }
     auto end = chrono::steady_clock::now();
-    chrono::duration<double> diff = end - start;
-    INFO("STL insert " << INSERT_N << " ints, cost " << diff << ".");
+    chrono::duration<double> stldiff = end - start;
+    INFO("STL insert " << INSERT_N << " ints, cost " << stldiff << ".");
 
     // HashMultiSetOpenAddress insert
     HashMultiSetOpenAddress<int> msoa;
@@ -548,8 +548,9 @@ TEST_CASE("Performance test") {
         msoa.insert(i);
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("XXX insert " << INSERT_N << " ints, cost " << diff << ".");
+    chrono::duration<double> xxxdiff = end - start;
+    INFO("XXX insert " << INSERT_N << " ints, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
 
     CHECK(true);
 
@@ -560,8 +561,8 @@ TEST_CASE("Performance test") {
         count_found += (stl.find(i) != stl.end());
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("STL lookup " << INSERT_N << " ints, cost " << diff << ".");
+    stldiff = end - start;
+    INFO("STL lookup " << INSERT_N << " ints, cost " << stldiff << ".");
     CHECK(count_found == INSERT_N);
 
     // HashMultiSetOpenAddress lookup
@@ -571,8 +572,9 @@ TEST_CASE("Performance test") {
         count_found += (msoa.find(i) != msoa.end());
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("XXX lookup " << INSERT_N << " ints, cost " << diff << ".");
+    xxxdiff = end - start;
+    INFO("XXX lookup " << INSERT_N << " ints, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(count_found == INSERT_N);
 
     // stl lookup non-exist
@@ -582,8 +584,8 @@ TEST_CASE("Performance test") {
         count_found += (stl.find(i) != stl.end());
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("STL lookup " << INSERT_N << " non-exist ints, cost " << diff << ".");
+    stldiff = end - start;
+    INFO("STL lookup " << INSERT_N << " non-exist ints, cost " << stldiff << ".");
     CHECK(count_found == 0);
 
     // HashMultiSetOpenAddress lookup non-exist
@@ -593,8 +595,9 @@ TEST_CASE("Performance test") {
         count_found += (msoa.find(i) != msoa.end());
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("XXX lookup " << INSERT_N << " non-exist ints, cost " << diff << ".");
+    xxxdiff = end - start;
+    INFO("XXX lookup " << INSERT_N << " non-exist ints, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(count_found == 0);
 
     // stl remove
@@ -603,8 +606,8 @@ TEST_CASE("Performance test") {
         stl.erase(stl.find(i));
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("STL remove " << REMOVE_N << " ints, cost " << diff << ".");
+    stldiff = end - start;
+    INFO("STL remove " << REMOVE_N << " ints, cost " << stldiff << ".");
 
     // HashMultiSetOpenAddress remove
     int remove_count = 0;
@@ -613,8 +616,9 @@ TEST_CASE("Performance test") {
         remove_count += !!msoa.remove(i);
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("XXX remove " << REMOVE_N << " ints, cost " << diff << ".");
+    xxxdiff = end - start;
+    INFO("XXX remove " << REMOVE_N << " ints, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(remove_count == REMOVE_N);
 
     // stl create-destroy
@@ -624,8 +628,8 @@ TEST_CASE("Performance test") {
         unordered_multiset<int> stl;
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("STL create-destroy " << N_ROUND << " rounds, cost " << diff << ".");
+    stldiff = end - start;
+    INFO("STL create-destroy " << N_ROUND << " rounds, cost " << stldiff << ".");
 
     // HashMultiSetOpenAddress create-destroy
     start = chrono::steady_clock::now();
@@ -634,8 +638,9 @@ TEST_CASE("Performance test") {
         msoa.load_factor();
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("XXX create-destroy " << N_ROUND << " rounds, cost " << diff << ".");
+    xxxdiff = end - start;
+    INFO("XXX create-destroy " << N_ROUND << " rounds, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(true);
 
     // stl create-insert-destroy
@@ -645,8 +650,8 @@ TEST_CASE("Performance test") {
         stl.insert(0);
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("STL create-insert-destroy " << N_ROUND << " rounds, cost " << diff << ".");
+    stldiff = end - start;
+    INFO("STL create-insert-destroy " << N_ROUND << " rounds, cost " << stldiff << ".");
 
     // HashMultiSetOpenAddress create-insert-destroy
     start = chrono::steady_clock::now();
@@ -655,8 +660,9 @@ TEST_CASE("Performance test") {
         msoa.insert(0);
     }
     end = chrono::steady_clock::now();
-    diff = end - start;
-    INFO("XXX create-insert-destroy " << N_ROUND << " rounds, cost " << diff << ".");
+    xxxdiff = end - start;
+    INFO("XXX create-insert-destroy " << N_ROUND << " rounds, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(true);
 }
 
