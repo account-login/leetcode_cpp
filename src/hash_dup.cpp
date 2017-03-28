@@ -537,206 +537,159 @@ TEST_CASE("Performance test") {
 
     vector<int> to_lookup_non_exist(to_remove_non_exist);
 
-    // stl insert
+    auto run_test = [](function<void()> func, const string &test_name, int number) {
+        auto start = chrono::steady_clock::now();
+        func();
+        auto end = chrono::steady_clock::now();
+        chrono::duration<double> diff = end - start;
+        INFO(test_name << " " << number << " ints, cost " << diff << ".");
+        CHECK(true);
+        return diff;
+    };
+
     unordered_multiset<int> stl;
-    auto start = chrono::steady_clock::now();
-    for (int i : to_insert) {
-        stl.insert(i);
-    }
-    auto end = chrono::steady_clock::now();
-    chrono::duration<double> stldiff = end - start;
-    INFO("STL insert " << INSERT_N << " ints, cost " << stldiff << ".");
+    auto stldiff = run_test([&]() {
+        for (int i : to_insert) {
+            stl.insert(i);
+        }
+    }, "STL insert", INSERT_N);
 
-    // HashMultiSetOpenAddress insert
     HashMultiSetOpenAddress<int> msoa;
-    start = chrono::steady_clock::now();
-    for (int i : to_insert) {
-        msoa.insert(i);
-    }
-    end = chrono::steady_clock::now();
-    chrono::duration<double> xxxdiff = end - start;
-    INFO("XXX insert " << INSERT_N << " ints, cost " << xxxdiff << ".");
+    auto xxxdiff = run_test([&]() {
+        for (int i : to_insert) {
+            msoa.insert(i);
+        }
+    }, "XXX insert", INSERT_N);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-
     CHECK(true);
 
-    // stl lookup
     int count_found = 0;
-    start = chrono::steady_clock::now();
-    for (int i : to_insert) {
-        count_found += (stl.find(i) != stl.end());
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL lookup " << INSERT_N << " ints, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i : to_insert) {
+            count_found += (stl.find(i) != stl.end());
+        }
+    }, "STL lookup", INSERT_N);
     CHECK(count_found == INSERT_N);
 
-    // HashMultiSetOpenAddress lookup
     count_found = 0;
-    start = chrono::steady_clock::now();
-    for (int i : to_insert) {
-        count_found += (msoa.find(i) != msoa.end());
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX lookup " << INSERT_N << " ints, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i : to_insert) {
+            count_found += (msoa.find(i) != msoa.end());
+        }
+    }, "XXX lookup", INSERT_N);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(count_found == INSERT_N);
 
-    // stl lookup non-exist
     count_found = 0;
-    start = chrono::steady_clock::now();
-    for (int i : to_lookup_non_exist) {
-        count_found += (stl.find(i) != stl.end());
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL lookup " << INSERT_N << " non-exist ints, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i : to_lookup_non_exist) {
+            count_found += (stl.find(i) != stl.end());
+        }
+    }, "STL lookup-non-exists", INSERT_N);
     CHECK(count_found == 0);
 
-    // HashMultiSetOpenAddress lookup non-exist
     count_found = 0;
-    start = chrono::steady_clock::now();
-    for (int i : to_lookup_non_exist) {
-        count_found += (msoa.find(i) != msoa.end());
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX lookup " << INSERT_N << " non-exist ints, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i : to_lookup_non_exist) {
+            count_found += (msoa.find(i) != msoa.end());
+        }
+    }, "XXX lookup-non-exists", INSERT_N);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(count_found == 0);
 
-    // stl remove
-    start = chrono::steady_clock::now();
-    for (int i : to_remove_exist) {
-        stl.erase(stl.find(i));
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL remove " << REMOVE_N << " ints, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i : to_remove_exist) {
+            stl.erase(stl.find(i));
+        }
+    }, "STL remove", REMOVE_N);
 
-    // HashMultiSetOpenAddress remove
     int remove_count = 0;
-    start = chrono::steady_clock::now();
-    for (int i : to_remove_exist) {
-        remove_count += !!msoa.remove(i);
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX remove " << REMOVE_N << " ints, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i : to_remove_exist) {
+            remove_count += !!msoa.remove(i);
+        }
+    }, "XXX remove", REMOVE_N);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(remove_count == REMOVE_N);
 
-    // stl insert-sequence
     stl.clear();
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < INSERT_N; i++) {
-        stl.insert(i);
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL insert-sequence " << INSERT_N << " rounds, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i = 0; i < INSERT_N; i++) {
+            stl.insert(i);
+        }
+    }, "STL insert-sequence", INSERT_N);
 
-    // HashMultiSetOpenAddress insert-sequence
     msoa.clear();
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < INSERT_N; i++) {
-        msoa.insert(i);
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX insert-sequence " << INSERT_N << " rounds, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i = 0; i < INSERT_N; i++) {
+            msoa.insert(i);
+        }
+    }, "XXX insert-sequence", INSERT_N);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-
     CHECK(true);
 
-    // stl lookup sequence
     count_found = 0;
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < INSERT_N; i++) {
-        count_found += (stl.find(i) != stl.end());
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL lookup sequence " << INSERT_N << " ints, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i = 0; i < INSERT_N; i++) {
+            count_found += (stl.find(i) != stl.end());
+        }
+    }, "STL lookup sequence", INSERT_N);
     CHECK(count_found == INSERT_N);
 
-    // HashMultiSetOpenAddress lookup sequence
     count_found = 0;
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < INSERT_N; i++) {
-        count_found += (msoa.find(i) != msoa.end());
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX lookup sequence " << INSERT_N << " ints, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i = 0; i < INSERT_N; i++) {
+            count_found += (msoa.find(i) != msoa.end());
+        }
+    }, "XXX lookup sequence", INSERT_N);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(count_found == INSERT_N);
 
-    // stl insert-dup
     stl.clear();
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < INSERT_N / 100; i++) {
-        stl.insert(i / 2);
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL insert-dup " << INSERT_N / 100 << " rounds, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i = 0; i < INSERT_N / 100; i++) {
+            stl.insert(i / 2);
+        }
+    }, "STL insert-dup", INSERT_N / 100);
 
-    // HashMultiSetOpenAddress insert-dup
     msoa.clear();
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < INSERT_N / 100; i++) {
-        msoa.insert(i / 2);
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX insert-dup " << INSERT_N / 100 << " rounds, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i = 0; i < INSERT_N / 100; i++) {
+            msoa.insert(i / 2);
+        }
+    }, "XXX insert-dup", INSERT_N / 100);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-
     CHECK(true);
 
-    // stl create-destroy
     int N_ROUND = 1000000;
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < N_ROUND; i++) {
-        unordered_multiset<int> stl;
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL create-destroy " << N_ROUND << " rounds, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i = 0; i < N_ROUND; i++) {
+            unordered_multiset<int> stl;
+        }
+    }, "STL create-destroy", N_ROUND);
 
-    // HashMultiSetOpenAddress create-destroy
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < N_ROUND; i++) {
-        HashMultiSetOpenAddress<int> msoa;
-        msoa.load_factor();
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX create-destroy " << N_ROUND << " rounds, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i = 0; i < N_ROUND; i++) {
+            HashMultiSetOpenAddress<int> msoa;
+            msoa.load_factor();
+        }
+    }, "XXX create-destroy", N_ROUND);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(true);
 
-    // stl create-insert-destroy
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < N_ROUND; i++) {
-        unordered_multiset<int> stl;
-        stl.insert(0);
-    }
-    end = chrono::steady_clock::now();
-    stldiff = end - start;
-    INFO("STL create-insert-destroy " << N_ROUND << " rounds, cost " << stldiff << ".");
+    stldiff = run_test([&] () {
+        for (int i = 0; i < N_ROUND; i++) {
+            unordered_multiset<int> stl;
+            stl.insert(0);
+        }
+    }, "STL create-insert-destroy", N_ROUND);
 
-    // HashMultiSetOpenAddress create-insert-destroy
-    start = chrono::steady_clock::now();
-    for (int i = 0; i < N_ROUND; i++) {
-        HashMultiSetOpenAddress<int> msoa;
-        msoa.insert(0);
-    }
-    end = chrono::steady_clock::now();
-    xxxdiff = end - start;
-    INFO("XXX create-insert-destroy " << N_ROUND << " rounds, cost " << xxxdiff << ".");
+    xxxdiff = run_test([&] () {
+        for (int i = 0; i < N_ROUND; i++) {
+            HashMultiSetOpenAddress<int> msoa;
+            msoa.insert(0);
+        }
+    }, "XXX create-insert-destroy", N_ROUND);
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(true);
 }
