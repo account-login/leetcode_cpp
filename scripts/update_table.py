@@ -124,7 +124,7 @@ def make_table(leetcodes):
                     if res:
                         url = res.group(1)
                 # last TEST_CASE
-                res = re.match(r'\s*TEST_CASE\(\s*"([^"]+)"\s*\).*', line)
+                res = re.match(r'\s*TEST_CASE\(\s*"([^"]+)".*', line)
                 if res:
                     title = res.group(1)
         assert url
