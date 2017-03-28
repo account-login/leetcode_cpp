@@ -547,151 +547,148 @@ TEST_CASE("Performance test") {
         return diff;
     };
 
+    auto run_both = [&](
+            const string &test_name, int number,
+            function<void()> stl_test, function<void()> xxx_test
+    ) {
+        auto stltime = run_test(stl_test, "STL " + test_name, number);
+        auto xxxtime = run_test(xxx_test, "XXX " + test_name, number);
+        INFO("XXX/STL: " << setprecision(2) << (stltime / xxxtime) << "x");
+        CHECK(true);
+    };
+
     unordered_multiset<int> stl;
-    auto stldiff = run_test([&]() {
-        for (int i : to_insert) {
-            stl.insert(i);
-        }
-    }, "STL insert", INSERT_N);
-
     HashMultiSetOpenAddress<int> msoa;
-    auto xxxdiff = run_test([&]() {
-        for (int i : to_insert) {
-            msoa.insert(i);
-        }
-    }, "XXX insert", INSERT_N);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(true);
 
-    int count_found = 0;
-    stldiff = run_test([&] () {
-        for (int i : to_insert) {
-            count_found += (stl.find(i) != stl.end());
-        }
-    }, "STL lookup", INSERT_N);
-    CHECK(count_found == INSERT_N);
+    run_both("insert", INSERT_N,
+        [&]() {
+            for (int i : to_insert) {
+                stl.insert(i);
+            }
+        },
+        [&]() {
+            for (int i : to_insert) {
+                msoa.insert(i);
+            }
+        });
 
-    count_found = 0;
-    xxxdiff = run_test([&] () {
-        for (int i : to_insert) {
-            count_found += (msoa.find(i) != msoa.end());
-        }
-    }, "XXX lookup", INSERT_N);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(count_found == INSERT_N);
+    run_both("lookup", INSERT_N,
+        [&]() {
+            int count_found = 0;
+            for (int i : to_insert) {
+                count_found += (stl.find(i) != stl.end());
+            }
+            CHECK(count_found == INSERT_N);
+        },
+        [&]() {
+            int count_found = 0;
+            for (int i : to_insert) {
+                count_found += (msoa.find(i) != msoa.end());
+            }
+            CHECK(count_found == INSERT_N);
+        });
 
-    count_found = 0;
-    stldiff = run_test([&] () {
-        for (int i : to_lookup_non_exist) {
-            count_found += (stl.find(i) != stl.end());
-        }
-    }, "STL lookup-non-exists", INSERT_N);
-    CHECK(count_found == 0);
+    run_both("lookup-non-exists", INSERT_N,
+        [&]() {
+            int count_found = 0;
+            for (int i : to_lookup_non_exist) {
+                count_found += (stl.find(i) != stl.end());
+            }
+            CHECK(count_found == 0);
+        },
+        [&]() {
+            int count_found = 0;
+            for (int i : to_lookup_non_exist) {
+                count_found += (msoa.find(i) != msoa.end());
+            }
+            CHECK(count_found == 0);
+        });
 
-    count_found = 0;
-    xxxdiff = run_test([&] () {
-        for (int i : to_lookup_non_exist) {
-            count_found += (msoa.find(i) != msoa.end());
-        }
-    }, "XXX lookup-non-exists", INSERT_N);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(count_found == 0);
-
-    stldiff = run_test([&] () {
-        for (int i : to_remove_exist) {
-            stl.erase(stl.find(i));
-        }
-    }, "STL remove", REMOVE_N);
-
-    int remove_count = 0;
-    xxxdiff = run_test([&] () {
-        for (int i : to_remove_exist) {
-            remove_count += !!msoa.remove(i);
-        }
-    }, "XXX remove", REMOVE_N);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(remove_count == REMOVE_N);
-
-    stl.clear();
-    stldiff = run_test([&] () {
-        for (int i = 0; i < INSERT_N; i++) {
-            stl.insert(i);
-        }
-    }, "STL insert-sequence", INSERT_N);
-
-    msoa.clear();
-    xxxdiff = run_test([&] () {
-        for (int i = 0; i < INSERT_N; i++) {
-            msoa.insert(i);
-        }
-    }, "XXX insert-sequence", INSERT_N);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(true);
-
-    count_found = 0;
-    stldiff = run_test([&] () {
-        for (int i = 0; i < INSERT_N; i++) {
-            count_found += (stl.find(i) != stl.end());
-        }
-    }, "STL lookup sequence", INSERT_N);
-    CHECK(count_found == INSERT_N);
-
-    count_found = 0;
-    xxxdiff = run_test([&] () {
-        for (int i = 0; i < INSERT_N; i++) {
-            count_found += (msoa.find(i) != msoa.end());
-        }
-    }, "XXX lookup sequence", INSERT_N);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(count_found == INSERT_N);
+    run_both("remove", REMOVE_N,
+        [&]() {
+            for (int i : to_remove_exist) {
+                stl.erase(stl.find(i));
+            }
+        },
+        [&]() {
+            int remove_count = 0;
+            for (int i : to_remove_exist) {
+                remove_count += !!msoa.remove(i);
+            }
+            CHECK(remove_count == REMOVE_N);
+        });
 
     stl.clear();
-    stldiff = run_test([&] () {
-        for (int i = 0; i < INSERT_N / 100; i++) {
-            stl.insert(i / 2);
-        }
-    }, "STL insert-dup", INSERT_N / 100);
-
     msoa.clear();
-    xxxdiff = run_test([&] () {
-        for (int i = 0; i < INSERT_N / 100; i++) {
-            msoa.insert(i / 2);
-        }
-    }, "XXX insert-dup", INSERT_N / 100);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(true);
+    run_both("insert-sequence", INSERT_N,
+        [&]() {
+            for (int i = 0; i < INSERT_N; i++) {
+                stl.insert(i);
+            }
+        },
+        [&]() {
+            for (int i = 0; i < INSERT_N; i++) {
+                msoa.insert(i);
+            }
+        });
+
+    run_both("lookup sequence", INSERT_N,
+        [&]() {
+            int count_found = 0;
+            for (int i = 0; i < INSERT_N; i++) {
+                count_found += (stl.find(i) != stl.end());
+            }
+            CHECK(count_found == INSERT_N);
+        },
+        [&]() {
+            int count_found = 0;
+            for (int i = 0; i < INSERT_N; i++) {
+                count_found += (msoa.find(i) != msoa.end());
+            }
+            CHECK(count_found == INSERT_N);
+        });
+
+    stl.clear();
+    msoa.clear();
+    run_both("insert-dup", INSERT_N / 100,
+        [&]() {
+            for (int i = 0; i < INSERT_N / 100; i++) {
+                stl.insert(i / 2);
+            }
+        },
+        [&]() {
+            for (int i = 0; i < INSERT_N / 100; i++) {
+                msoa.insert(i / 2);
+            }
+        });
 
     int N_ROUND = 1000000;
-    stldiff = run_test([&] () {
-        for (int i = 0; i < N_ROUND; i++) {
-            unordered_multiset<int> stl;
-        }
-    }, "STL create-destroy", N_ROUND);
+    run_both("create-destroy", N_ROUND,
+        [&]() {
+            for (int i = 0; i < N_ROUND; i++) {
+                unordered_multiset<int> stl;
+            }
+        },
+        [&]() {
+            for (int i = 0; i < N_ROUND; i++) {
+                HashMultiSetOpenAddress<int> msoa;
+                msoa.load_factor();
+            }
+        });
 
-    xxxdiff = run_test([&] () {
-        for (int i = 0; i < N_ROUND; i++) {
-            HashMultiSetOpenAddress<int> msoa;
-            msoa.load_factor();
-        }
-    }, "XXX create-destroy", N_ROUND);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(true);
-
-    stldiff = run_test([&] () {
-        for (int i = 0; i < N_ROUND; i++) {
-            unordered_multiset<int> stl;
-            stl.insert(0);
-        }
-    }, "STL create-insert-destroy", N_ROUND);
-
-    xxxdiff = run_test([&] () {
-        for (int i = 0; i < N_ROUND; i++) {
-            HashMultiSetOpenAddress<int> msoa;
-            msoa.insert(0);
-        }
-    }, "XXX create-insert-destroy", N_ROUND);
-    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
-    CHECK(true);
+    run_both("create-insert-destroy", N_ROUND,
+        [&]() {
+            for (int i = 0; i < N_ROUND; i++) {
+                unordered_multiset<int> stl;
+                stl.insert(0);
+            }
+        },
+        [&]() {
+            for (int i = 0; i < N_ROUND; i++) {
+                HashMultiSetOpenAddress<int> msoa;
+                msoa.insert(0);
+            }
+        });
 }
 
 TEST_CASE("381. Insert Delete GetRandom O(1) - Duplicates allowed") {
