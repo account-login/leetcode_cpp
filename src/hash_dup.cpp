@@ -184,6 +184,12 @@ public:
         return iterator(*this, numeric_limits<size_t>::max());
     }
 
+    void clear() {
+        this->values.clear();
+        this->flags.clear();
+        this->_count = 0;
+    }
+
     /** Inserts a value to the collection.
      *
      * Returns true if the collection did not already contain the specified element.
@@ -620,6 +626,75 @@ TEST_CASE("Performance test") {
     INFO("XXX remove " << REMOVE_N << " ints, cost " << xxxdiff << ".");
     INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
     CHECK(remove_count == REMOVE_N);
+
+    // stl insert-sequence
+    stl.clear();
+    start = chrono::steady_clock::now();
+    for (int i = 0; i < INSERT_N; i++) {
+        stl.insert(i);
+    }
+    end = chrono::steady_clock::now();
+    stldiff = end - start;
+    INFO("STL insert-sequence " << INSERT_N << " rounds, cost " << stldiff << ".");
+
+    // HashMultiSetOpenAddress insert-sequence
+    msoa.clear();
+    start = chrono::steady_clock::now();
+    for (int i = 0; i < INSERT_N; i++) {
+        msoa.insert(i);
+    }
+    end = chrono::steady_clock::now();
+    xxxdiff = end - start;
+    INFO("XXX insert-sequence " << INSERT_N << " rounds, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
+
+    CHECK(true);
+
+    // stl lookup sequence
+    count_found = 0;
+    start = chrono::steady_clock::now();
+    for (int i = 0; i < INSERT_N; i++) {
+        count_found += (stl.find(i) != stl.end());
+    }
+    end = chrono::steady_clock::now();
+    stldiff = end - start;
+    INFO("STL lookup sequence " << INSERT_N << " ints, cost " << stldiff << ".");
+    CHECK(count_found == INSERT_N);
+
+    // HashMultiSetOpenAddress lookup sequence
+    count_found = 0;
+    start = chrono::steady_clock::now();
+    for (int i = 0; i < INSERT_N; i++) {
+        count_found += (msoa.find(i) != msoa.end());
+    }
+    end = chrono::steady_clock::now();
+    xxxdiff = end - start;
+    INFO("XXX lookup sequence " << INSERT_N << " ints, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
+    CHECK(count_found == INSERT_N);
+
+    // stl insert-dup
+    stl.clear();
+    start = chrono::steady_clock::now();
+    for (int i = 0; i < INSERT_N / 100; i++) {
+        stl.insert(i / 2);
+    }
+    end = chrono::steady_clock::now();
+    stldiff = end - start;
+    INFO("STL insert-dup " << INSERT_N / 100 << " rounds, cost " << stldiff << ".");
+
+    // HashMultiSetOpenAddress insert-dup
+    msoa.clear();
+    start = chrono::steady_clock::now();
+    for (int i = 0; i < INSERT_N / 100; i++) {
+        msoa.insert(i / 2);
+    }
+    end = chrono::steady_clock::now();
+    xxxdiff = end - start;
+    INFO("XXX insert-dup " << INSERT_N / 100 << " rounds, cost " << xxxdiff << ".");
+    INFO("XXX/STL: " << setprecision(2) << (stldiff / xxxdiff) << "x");
+
+    CHECK(true);
 
     // stl create-destroy
     int N_ROUND = 1000000;
