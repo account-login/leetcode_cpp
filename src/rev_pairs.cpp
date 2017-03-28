@@ -183,7 +183,7 @@ tuple<int, int> avl_verify(AVLNode *node) {
     tie(rdepth, rsize) = avl_verify(node->right);
 
     if (node->left) {
-        REQUIRE(node->left->data < node->data);
+        REQUIRE(node->left->data <= node->data);
     }
     if (node->right) {
         REQUIRE(node->right->data >= node->data);
@@ -210,11 +210,19 @@ TEST_CASE("AVLTree::insert() sequence", "[tree]") {
 TEST_CASE("AVLTree::insert() random", "[tree]") {
     AVLTree tree;
     for (int i = 0; i < 100; i++) {
-        tree.insert(rand());
+        tree.insert(abs(rand()) % 90);
         avl_verify(tree.root);
     }
 }
 
+
+TEST_CASE("AVLTree::insert() duplicated", "[tree]") {
+    AVLTree tree;
+    for (int i = 0; i < 100; i++) {
+        tree.insert(i / 10);
+        avl_verify(tree.root);
+    }
+}
 
 TEST_CASE("AVLTree::count_gt()", "[tree]") {
     AVLTree tree;
