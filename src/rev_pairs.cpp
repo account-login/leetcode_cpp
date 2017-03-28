@@ -110,13 +110,16 @@ AVLNode *avl_insert(AVLNode *root, AVLNode *node) {
 
 
 int avl_count_gt(AVLNode *root, int data) {
-    if (root == nullptr) {
-        return 0;
-    } else if (data < root->data) {
-        return avl_count_gt(root->left, data) + 1 + avl_size(root->right);
-    } else {
-        return avl_count_gt(root->right, data);
+    int count = 0;
+    while (root != nullptr) {
+        if (data < root->data) {
+            count += 1 + avl_size(root->right);
+            root = root->left;
+        } else {
+            root = root->right;
+        }
     }
+    return count;
 }
 
 
