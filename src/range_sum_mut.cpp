@@ -169,16 +169,26 @@ void bit_update(vector<int> &bit, int index, int value) {
 }
 
 
+// O(n)
+vector<int> bit_init(const vector<int> &arr) {
+    vector<int> ans = arr;
+    for (size_t i = 0; i < ans.size(); i++) {
+        int parent = bit_parent(i);
+        if (parent < ans.size()) {
+            ans[parent] += ans[i];
+        }
+    }
+    return ans;
+}
+
+
 class NumArray_bit {
 private:
     vector<int> bit;
 
 public:
     explicit NumArray_bit(const vector<int> &nums) {
-        this->bit.resize(nums.size(), 0);
-        for (size_t i = 0; i < nums.size(); i++) {
-            bit_add(this->bit, i, nums[i]);
-        }
+        this->bit = bit_init(nums);
     }
 
     void update(int i, int val) {
@@ -266,6 +276,7 @@ TEST_CASE("Test BIT", "[bit]") {
         bit_add(bit, i, test_data[i]);
         CHECK(bit_get(bit, i) == test_data[i]);
     }
+    CHECK(bit == bit_init(test_data));
 
     check_bit_prefix_sum(bit, test_data);
 
@@ -278,6 +289,7 @@ TEST_CASE("Test BIT", "[bit]") {
         check_bit_prefix_sum(bit, test_data);
         check_bit_sum(bit, test_data);
     }
+    CHECK(bit == bit_init(test_data));
 }
 
 TEST_CASE("Test sum", "[sol]") {
