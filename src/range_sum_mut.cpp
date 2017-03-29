@@ -143,7 +143,17 @@ int bit_sum_prefix(const vector<int> &bit, int prefixlen) {
 
 
 int bit_sum(const vector<int> &bit, int start, int stop) {
-    return bit_sum_prefix(bit, stop) - bit_sum_prefix(bit, start);
+    assert(0 <= start && start <= stop);
+    // return bit_sum_prefix(bit, stop) - bit_sum_prefix(bit, start);
+    int ans = 0;
+    int long_idx;
+    for (long_idx = stop - 1; long_idx > start - 1; long_idx = bit_prev(long_idx)) {
+        ans += bit[long_idx];
+    }
+    for (int short_idx = start - 1; short_idx > long_idx; short_idx = bit_prev(short_idx)) {
+        ans -= bit[short_idx];
+    }
+    return ans;
 }
 
 

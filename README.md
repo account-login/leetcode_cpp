@@ -65,7 +65,7 @@ Solutions for leetcode using c++11.
 | [76. Minimum Window Substring](<https://leetcode.com/problems/minimum-window-substring/>)                                                | [min_window](<src/min_window.cpp>)               |   9ms |   86% |
 | [335. Self Crossing](<https://leetcode.com/problems/self-crossing/>)                                                                     | [self_cross](<src/self_cross.cpp>)               |   0ms |       |
 | [165. Compare Version Numbers](<https://leetcode.com/problems/compare-version-numbers/>)                                                 | [version_cmp](<src/version_cmp.cpp>)             |   0ms |       |
-| [307. Range Sum Query - Mutable](<https://leetcode.com/problems/range-sum-query-mutable/>)                                               | [range_sum_mut](<src/range_sum_mut.cpp>)         |  52ms |   63% |
+| [307. Range Sum Query - Mutable](<https://leetcode.com/problems/range-sum-query-mutable/>)                                               | [range_sum_mut](<src/range_sum_mut.cpp>)         |  89ms |   88% |
 | [179. Largest Number](<https://leetcode.com/problems/largest-number/>)                                                                   | [largest_num](<src/largest_num.cpp>)             |   3ms |   94% |
 | [211. Add and Search Word - Data structure design](<https://leetcode.com/problems/add-and-search-word-data-structure-design/>)           | [add_n_search](<src/add_n_search.cpp>)           |  69ms |   96% |
 | [98. Validate Binary Search Tree](<https://leetcode.com/problems/validate-binary-search-tree/>)                                          | [valid_bst](<src/valid_bst.cpp>)                 |  13ms |   40% |
