@@ -28,13 +28,13 @@ static inline int heap_right(int parent) {
 }
 
 
-class NumArray {
+class NumArray_heap {
 public:
     vector<int> sum_heap;
     int nums_len;
     int height;
 
-    explicit NumArray(const vector<int> &nums)
+    explicit NumArray_heap(const vector<int> &nums)
         : nums_len(nums.size())
     {
         // 2 ^ n >= nums.size()
@@ -114,6 +114,80 @@ public:
 };
 
 
+int bit_parent(int index) {
+    return index | (index + 1);
+}
+
+
+void bit_add(vector<int> &bit, int index, int value) {
+    assert(0 <= index && index < bit.size());
+    for (; index < bit.size(); index = bit_parent(index)) {
+        bit[index] += value;
+    }
+}
+
+
+int bit_prev(int index) {
+    return (index & (index + 1)) - 1;
+}
+
+
+int bit_sum_prefix(const vector<int> &bit, int prefixlen) {
+    assert(0 <= prefixlen && prefixlen <= bit.size());
+    int ans = 0;
+    for (int index = prefixlen - 1; index >= 0; index = bit_prev(index)) {
+        ans += bit[index];
+    }
+    return ans;
+}
+
+
+int bit_sum(const vector<int> &bit, int start, int stop) {
+    return bit_sum_prefix(bit, stop) - bit_sum_prefix(bit, start);
+}
+
+
+int bit_get(const vector<int> &bit, int index) {
+    assert(0 <= index && index < bit.size());
+    return bit_sum(bit, index, index + 1);
+}
+
+
+void bit_update(vector<int> &bit, int index, int value) {
+    int diff = value - bit_get(bit, index);
+    bit_add(bit, index, diff);
+}
+
+
+class NumArray_bit {
+private:
+    vector<int> bit;
+
+public:
+    explicit NumArray_bit(const vector<int> &nums) {
+        this->bit.resize(nums.size(), 0);
+        for (size_t i = 0; i < nums.size(); i++) {
+            bit_add(this->bit, i, nums[i]);
+        }
+    }
+
+    void update(int i, int val) {
+        bit_update(this->bit, i, val);
+    }
+
+    int sumRange(int i, int j) {
+        return bit_sum(this->bit, i, j + 1);
+    }
+};
+
+
+#ifdef ALGO_heap
+typedef NumArray_heap NumArray;
+#else
+typedef NumArray_bit NumArray;
+#endif
+
+
 // Your NumArray object will be instantiated and called as such:
 // NumArray numArray(nums);
 // numArray.sumRange(0, 1);
@@ -122,37 +196,81 @@ public:
 
 
 #ifdef RUN_TEST
-TEST_CASE("Test heap") {
-    auto na = NumArray({ 1 });
+TEST_CASE("Test heap", "[heap]") {
+    auto na = NumArray_heap({ 1 });
     vector<int> heap = { 1 };
     CHECK(na.sum_heap == heap);
 
-    na = NumArray({});
+    na = NumArray_heap({});
     heap = { 0 };
     CHECK(na.sum_heap == heap);
 
-    na = NumArray({ 1, 2 });
+    na = NumArray_heap({ 1, 2 });
     heap = { 3, 1, 2 };
     CHECK(na.sum_heap == heap);
 
-    na = NumArray({ 1, 2, 3 });
+    na = NumArray_heap({ 1, 2, 3 });
     heap = { 6, 3, 3, 1, 2, 3, 0 };
     CHECK(na.sum_heap == heap);
 }
 
-TEST_CASE("Test update") {
-    auto na = NumArray({ 1 });
+TEST_CASE("Test update", "[heap]") {
+    auto na = NumArray_heap({ 1 });
     vector<int> heap = { 2 };
     na.update(0, 2);
     CHECK(na.sum_heap == heap);
 
-    na = NumArray({ 1, 2, 3 });
+    na = NumArray_heap({ 1, 2, 3 });
     na.update(0, 4);
     heap = { 9, 6, 3, 4, 2, 3, 0 };
     CHECK(na.sum_heap == heap);
 }
 
-TEST_CASE("Test sum") {
+void check_bit_prefix_sum(const vector<int> &bit, const vector<int> &arr) {
+    int sum = 0;
+    for (size_t i = 0; i < arr.size(); i++) {
+        CHECK(bit_sum_prefix(bit, i) == sum);
+        sum += arr[i];
+    }
+    CHECK(bit_sum_prefix(bit, arr.size()) == sum);
+}
+
+void check_bit_sum(const vector<int> &bit, const vector<int> &arr) {
+    vector<int> prefix_sum = arr;
+    for (size_t i = 1; i < arr.size(); i++) {
+        prefix_sum[i] += prefix_sum[i - 1];
+    }
+
+    for (size_t i = 0; i < arr.size(); i++) {
+        for (size_t j = i; j < arr.size(); j++) {
+            CHECK(bit_sum(bit, i + 1, j + 1) == prefix_sum[j] - prefix_sum[i]);
+        }
+    }
+}
+
+TEST_CASE("Test BIT", "[bit]") {
+    vector<int> test_data = {1, 10, 100, 1000, 10000, 100000};
+
+    vector<int> bit(test_data.size(), 0);
+    for (size_t i = 0; i < test_data.size(); i++) {
+        bit_add(bit, i, test_data[i]);
+        CHECK(bit_get(bit, i) == test_data[i]);
+    }
+
+    check_bit_prefix_sum(bit, test_data);
+
+    vector<int> test_data_add = {3, 33, 333, 333, 3333, 33333};
+    for (size_t i = 0; i < test_data_add.size(); i++) {
+        test_data[i] += test_data_add[i];
+        bit_add(bit, i, test_data_add[i]);
+
+        CHECK(bit_get(bit, i) == test_data[i]);
+        check_bit_prefix_sum(bit, test_data);
+        check_bit_sum(bit, test_data);
+    }
+}
+
+TEST_CASE("Test sum", "[sol]") {
     auto na = NumArray({ 1 });
     CHECK(na.sumRange(0, 0) == 1);
 
@@ -169,7 +287,7 @@ TEST_CASE("Test sum") {
     CHECK(na.sumRange(1, 2) == 5);
 }
 
-TEST_CASE("307. Range Sum Query - Mutable") {
+TEST_CASE("307. Range Sum Query - Mutable", "[sol]") {
     auto na = NumArray({ 1, 2, 3 });
     CHECK(na.sumRange(1, 2) == 5);
 
