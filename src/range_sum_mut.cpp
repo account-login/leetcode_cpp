@@ -50,16 +50,8 @@ public:
             sum_heap[i + heap_parent(heap_len)] = nums[i];
         }
 
-        int level_width = 1 << (height - 1);
-        int start = heap_parent(heap_parent(heap_len));
-        while (level_width >= 1) {
-            for (int i = 0; i < level_width; i++) {
-                int index = start + i;
-                sum_heap[index] = sum_heap[heap_left(index)] + sum_heap[heap_right(index)];
-            }
-
-            start = heap_parent(start);
-            level_width /= 2;
+        for (int parent = heap_parent(heap_len) - 1; parent >= 0; parent--) {
+            sum_heap[parent] = sum_heap[heap_left(parent)] + sum_heap[heap_right(parent)];
         }
     }
 
