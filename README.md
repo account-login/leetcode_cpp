@@ -101,4 +101,5 @@ Solutions for leetcode using c++11.
 | [460. LFU Cache](<https://leetcode.com/problems/lfu-cache/>)                                                                             | [lfu_cache](<src/lfu_cache.cpp>)                 | 179ms |   87% |
 | [466. Count The Repetitions](<https://leetcode.com/problems/count-the-repetitions/>)                                                     | [count_rep](<src/count_rep.cpp>)                 |  62ms |   75% |
 | [493. Reverse Pairs](<https://leetcode.com/problems/reverse-pairs/>)                                                                     | [rev_pairs](<src/rev_pairs.cpp>)                 | 379ms |   30% |
+| [327. Count of Range Sum](<https://leetcode.com/problems/count-of-range-sum/>)                                                           | [count_range_sum](<src/count_range_sum.cpp>)     |  55ms |   32% |
 
