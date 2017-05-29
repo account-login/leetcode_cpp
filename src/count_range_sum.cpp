@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstdlib>
 #include <vector>
 
 #ifdef RUN_TEST
@@ -256,7 +257,6 @@ public:
 TEST_CASE("RBTree::add() sequence", "[tree]") {
     RBTree<int> tree;
     for (int i = 0; i < 100; i++) {
-        CAPTURE(i);
         tree.add(i);
         tree.verify();
     }
