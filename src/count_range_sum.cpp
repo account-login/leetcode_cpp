@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <vector>
@@ -233,7 +235,7 @@ private:
 };
 
 
-class Solution {
+class Solution_tree {
 public:
     int countRangeSum(const vector<int> &nums, int lower, int upper) {
         assert(lower <= upper);
@@ -251,6 +253,108 @@ public:
         return ans;
     }
 };
+
+
+size_t lowbit(size_t n) {
+    return n & ~(n - 1);
+}
+
+
+template<class T>
+void bit_add(vector<T> &data, size_t index, T delta) {
+    assert(index < data.size());
+    while (index < data.size()) {
+        data[index] += delta;
+        index = (index + 1) + lowbit(index + 1) - 1;
+    }
+}
+
+
+template<class T>
+T bit_prefix_sum(vector<T> &data, size_t len) {
+    assert(len <= data.size());
+    T ans = 0;
+    while (len > 0) {
+        ans += data[len - 1];
+        len -= lowbit(len);
+    }
+    return ans;
+}
+
+
+template<class T>
+T bit_sum_range(vector<T> &data, size_t i, size_t j) {
+    assert(i < j);
+    return bit_prefix_sum(data, j) - bit_prefix_sum(data, i);
+}
+
+
+class Solution_bit {
+public:
+    int countRangeSum(const vector<int> &nums, int lower, int upper) {
+        // prefix sum
+        vector<int64_t> prefixies;
+        prefixies.reserve(nums.size() + 1);
+        prefixies.push_back(0);
+        for (size_t i = 0; i < nums.size(); ++i) {
+            prefixies.push_back(prefixies.back() + nums[i]);
+        }
+
+        // sorted indices of prefix sum
+        vector<size_t > indices;
+        indices.reserve(prefixies.size());
+        for (size_t i = 0; i < prefixies.size(); ++i) {
+            indices.push_back(i);
+        }
+        sort(indices.begin(), indices.end(),
+            [&](size_t i, size_t j) -> bool { return prefixies[i] < prefixies[j]; }
+        );
+
+        // sorted prefix sum
+        vector<int64_t> sorted;
+        sorted.reserve(prefixies.size());
+        for (size_t i = 0; i < prefixies.size(); ++i) {
+            sorted.push_back(prefixies[indices[i]]);
+        }
+
+        // order in sorted prefix sum
+        vector<size_t> order(prefixies.size(), 0);
+        size_t *prev = nullptr;
+        size_t max_order = 0;
+        for (size_t *cur = indices.data(); cur < indices.data() + indices.size(); ++cur) {
+            if (prev != nullptr && prefixies[*cur] > prefixies[*prev]) {
+                max_order++;
+            }
+            prev = cur;
+            order[*cur] = max_order;
+        }
+
+        vector<int64_t> bit((size_t)(max_order + 1), 0);
+
+        int ans = 0;
+        for (size_t i = 0; i < prefixies.size(); ++i) {
+            int64_t lo = prefixies[i] - upper;
+            int64_t hi = prefixies[i] - lower;
+            auto begin = lower_bound(sorted.begin(), sorted.end(), lo);
+            auto end = upper_bound(sorted.begin(), sorted.end(), hi);
+            if (begin != end) {
+                size_t v1 = order[indices[begin - sorted.begin()]];
+                size_t v2 = order[indices[end - sorted.begin() - 1]];
+                ans += bit_sum_range(bit, v1, v2 + 1);
+            }
+            bit_add<int64_t>(bit, order[i], 1);
+        }
+
+        return ans;
+    }
+};
+
+
+#ifdef ALGO_tree
+typedef Solution_tree Solution;
+#else
+typedef Solution_bit Solution;
+#endif
 
 
 #ifdef RUN_TEST
@@ -281,13 +385,38 @@ TEST_CASE("RBTree::add() duplicated", "[tree]") {
 }
 
 
-TEST_CASE("327. Count of Range Sum") {
+double get_time() {
+    auto tm = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> d = tm.time_since_epoch();
+    return d.count();
+}
+
+
+TEST_CASE("327. Count of Range Sum", "[solution]") {
     Solution s;
 
     CHECK(s.countRangeSum({1}, 1, 1) == 1);
+    CHECK(s.countRangeSum({0, 0}, 0, 0) == 3);
+    CHECK(s.countRangeSum({1, 0, 0, -5}, 0, 0) == 3);
     CHECK(s.countRangeSum({1, 5}, 5, 5) == 1);
     CHECK(s.countRangeSum({-2, 5, -1}, -2, 2) == 3);
     CHECK(s.countRangeSum({2147483647, -2147483648, -1, 0}, -1, 0) == 4);
     CHECK(s.countRangeSum({-1,-3,1,1,0,0}, -2, 1) == 15);
+
+    const int N = 1000000;
+    vector<int> data;
+    data.reserve(N);
+    for (size_t i = 0; i < N; ++i) {
+        if (i % 2 == 0) {
+            data.push_back(1);
+        } else {
+            data.push_back(-1);
+        }
+    }
+    double t1 = get_time();
+    int result = s.countRangeSum(data, -100, 100);
+    double t2 = get_time();
+    CAPTURE(t2 - t1);
+    CHECK(result != 0);
 }
 #endif
