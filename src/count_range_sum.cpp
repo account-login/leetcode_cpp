@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
+#include <memory>
 #include <vector>
 
 #ifdef RUN_TEST
@@ -25,7 +26,7 @@ enum class RBColor : uint8_t { R, B };
 
 template<class T>
 struct RBNode {
-    explicit RBNode(int data) : data(data) {}
+    explicit RBNode(T data) : data(data) {}
 
     RBColor color = RBColor::R;
     uint16_t size = 1;
@@ -211,12 +212,17 @@ void rb_root_verify(RBNode<T> *root) {
 template<class T>
 class RBTree {
 public:
-    ~RBTree() {
-        rb_delete(this->root);
-    }
+    // ~RBTree() {
+    //     rb_delete(this->root);
+    // }
 
-    void add(T data) {
-        this->root = rb_insert(this->root, new RBNode<T>(data));
+     // void add(T data) {
+     //     this->root = rb_insert(this->root, new RBNode<T>(data));
+     //     this->root->color = RBColor::B;
+     // }
+
+    void insert(RBNode<T> &node) {
+        this->root = rb_insert(this->root, &node);
         this->root->color = RBColor::B;
     }
 
@@ -235,6 +241,35 @@ private:
 };
 
 
+template<class T>
+class StaticBuffer {
+public:
+    explicit StaticBuffer(size_t size)
+        : buf(new char [size * sizeof(T)]),
+          cur(reinterpret_cast<T *>(buf.get())),
+          end(cur + size)
+    {}
+
+    StaticBuffer(const StaticBuffer &) = delete;
+    StaticBuffer(StaticBuffer &&) = delete;
+    StaticBuffer &operator=(const StaticBuffer &) = delete;
+    StaticBuffer &operator=(StaticBuffer &&) = delete;
+
+    template<class ...Args>
+    T &get(Args &&...args) {
+        assert(this->cur < this->end);
+        T *ret = this->cur++;
+        new (ret) T(std::forward<Args>(args)...);
+        return *ret;
+    }
+
+private:
+    std::unique_ptr<char []> buf;
+    T *cur;
+    T *end;
+};
+
+
 class Solution_tree {
 public:
     int countRangeSum(const vector<int> &nums, int lower, int upper) {
@@ -244,8 +279,13 @@ public:
         int64_t prefix_sum = 0;
         RBTree<int64_t> tree;
 
+        typedef RBNode<int64_t> NodeType;
+        // pre-allocated buffer
+        StaticBuffer<NodeType> buf(nums.size());
+
         for (int data : nums) {
-            tree.add(prefix_sum);
+            NodeType &cur = buf.get(prefix_sum);
+            tree.insert(cur);
             prefix_sum += data;
             ans += tree.count_range(prefix_sum - upper, prefix_sum - lower);
         }
@@ -350,18 +390,20 @@ public:
 };
 
 
-#ifdef ALGO_tree
-typedef Solution_tree Solution;
-#else
+#ifdef ALGO_bit
 typedef Solution_bit Solution;
+#else
+typedef Solution_tree Solution;
 #endif
 
 
 #ifdef RUN_TEST
 TEST_CASE("RBTree::add() sequence", "[tree]") {
     RBTree<int> tree;
-    for (int i = 0; i < 100; i++) {
-        tree.add(i);
+    int N = 100;
+    StaticBuffer<RBNode<int>> buf((size_t)N);
+    for (int i = 0; i < N; i++) {
+        tree.insert(buf.get(i));
         tree.verify();
     }
 }
@@ -369,8 +411,10 @@ TEST_CASE("RBTree::add() sequence", "[tree]") {
 
 TEST_CASE("RBTree::add() random", "[tree]") {
     RBTree<int> tree;
-    for (int i = 0; i < 100; i++) {
-        tree.add(abs(rand()) % 90);
+    int N = 100;
+    StaticBuffer<RBNode<int>> buf((size_t)N);
+    for (int i = 0; i < N; i++) {
+        tree.insert(buf.get(abs(rand()) % int(N * 0.9)));
         tree.verify();
     }
 }
@@ -378,8 +422,10 @@ TEST_CASE("RBTree::add() random", "[tree]") {
 
 TEST_CASE("RBTree::add() duplicated", "[tree]") {
     RBTree<int> tree;
-    for (int i = 0; i < 100; i++) {
-        tree.add(i / 10);
+    int N = 100;
+    StaticBuffer<RBNode<int>> buf((size_t)N);
+    for (int i = 0; i < N; i++) {
+        tree.insert(buf.get(i / 10));
         tree.verify();
     }
 }
