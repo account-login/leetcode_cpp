@@ -1,5 +1,5 @@
 
-CXXFLAGS += -Wall -g -std=gnu++11 -DRUN_TEST=1
+CXXFLAGS += -Wall -Wextra -pedantic -g -std=c++11 -DRUN_TEST=1
 
 .PHONY : all clean
 .PRECIOUS: build/%	# This will tell make that intermediate files are also precious
