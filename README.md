@@ -102,4 +102,5 @@ Solutions for leetcode using c++11.
 | [466. Count The Repetitions](<https://leetcode.com/problems/count-the-repetitions/>)                                                     | [count_rep](<src/count_rep.cpp>)                 |  62ms |   75% |
 | [493. Reverse Pairs](<https://leetcode.com/problems/reverse-pairs/>)                                                                     | [rev_pairs](<src/rev_pairs.cpp>)                 | 379ms |   30% |
 | [327. Count of Range Sum](<https://leetcode.com/problems/count-of-range-sum/>)                                                           | [count_range_sum](<src/count_range_sum.cpp>)     |  19ms |   83% |
+| [523. Continuous Subarray Sum](<https://leetcode.com/problems/continuous-subarray-sum/>)                                                 | [sub_arr_sum](<src/sub_arr_sum.cpp>)             |  28ms |   75% |
 
