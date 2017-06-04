@@ -1,3 +1,4 @@
+#include <limits>
 #include <vector>
 #include <unordered_set>
 
@@ -56,6 +57,9 @@ TEST_CASE("523. Continuous Subarray Sum") {
     CHECK_FALSE(s.checkSubarraySum({2}, 2));
     CHECK_FALSE(s.checkSubarraySum({1, 1}, 3));
     CHECK(s.checkSubarraySum({0, 0}, 0));
+    const int MIN = numeric_limits<int>::min();
+    CHECK(s.checkSubarraySum({MIN + 1, -1}, MIN));
+    CHECK(s.checkSubarraySum({MIN + 3, -1, -1, -1}, MIN));
 
     CHECK(s.checkSubarraySum({23, 2, 4, 6, 7}, 6));
     CHECK(s.checkSubarraySum({23, 2, 6, 4, 7}, 6));
