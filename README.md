@@ -59,7 +59,7 @@ Solutions for leetcode using c++11.
 | [68. Text Justification](<https://leetcode.com/problems/text-justification/>)                                                            | [text_just](<src/text_just.cpp>)                 |       |       |
 | [214. Shortest Palindrome](<https://leetcode.com/problems/shortest-palindrome/>)                                                         | [short_palin](<src/short_palin.cpp>)             |       |       |
 | [30. Substring with Concatenation of All Words](<https://leetcode.com/problems/substring-with-concatenation-of-all-words/>)              | [substr_cat](<src/substr_cat.cpp>)               | 149ms |   75% |
-| [174. Dungeon Game](<https://leetcode.com/problems/dungeon-game/>)                                                                       | [dungeon](<src/dungeon.cpp>)                     |       |       |
+| [174. Dungeon Game](<https://leetcode.com/problems/dungeon-game/>)                                                                       | [dungeon](<src/dungeon.cpp>)                     |   6ms |   40% |
 | [15. 3Sum](<https://leetcode.com/problems/3sum/>)                                                                                        | [3sum](<src/3sum.cpp>)                           |  49ms |   70% |
 | [130. Surrounded Regions](<https://leetcode.com/problems/surrounded-regions/>)                                                           | [surr_region](<src/surr_region.cpp>)             |  49ms |    8% |
 | [76. Minimum Window Substring](<https://leetcode.com/problems/minimum-window-substring/>)                                                | [min_window](<src/min_window.cpp>)               |   9ms |   86% |
