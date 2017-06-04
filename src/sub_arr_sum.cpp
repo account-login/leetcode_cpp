@@ -28,6 +28,7 @@ public:
         }
 
         unordered_set<int> prefix_sum {0, nums[0]};
+        prefix_sum.reserve(nums.size());
         int prev = nums[0];
         for (size_t i = 1; i < nums.size(); ++i) {
             int cur = (prev + nums[i]) % k;
