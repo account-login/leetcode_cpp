@@ -103,4 +103,5 @@ Solutions for leetcode using c++11.
 | [493. Reverse Pairs](<https://leetcode.com/problems/reverse-pairs/>)                                                                     | [rev_pairs](<src/rev_pairs.cpp>)                 | 379ms |   30% |
 | [327. Count of Range Sum](<https://leetcode.com/problems/count-of-range-sum/>)                                                           | [count_range_sum](<src/count_range_sum.cpp>)     |  19ms |   83% |
 | [523. Continuous Subarray Sum](<https://leetcode.com/problems/continuous-subarray-sum/>)                                                 | [sub_arr_sum](<src/sub_arr_sum.cpp>)             |  26ms |   75% |
+| [152. Maximum Product Subarray](<https://leetcode.com/problems/maximum-product-subarray/>)                                               | [max_product](<src/max_product.cpp>)             |   3ms |   62% |
 
