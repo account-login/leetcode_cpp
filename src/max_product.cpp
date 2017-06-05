@@ -24,36 +24,31 @@ public:
 
         int ans = nums[0];
         int ref = 1;
-        int prev = 1;
-        bool has_zero = false;
+        int product = 1;
 
         for (int n : nums) {
             if (n == 0) {
                 ref = 1;
-                prev = 1;
-                has_zero = true;
+                product = 1;
+                ans = max(ans, 0);
             } else {
-                int cur = prev * n;
-                if (cur > 0) {
-                    ans = max(ans, cur);
+                product *= n;
+                if (product > 0) {
+                    ans = max(ans, product);
                     if (ref > 0) {
-                        ref = max(ref, cur);
+                        ref = max(ref, product);
                     }
                 } else {
-                    ans = max(ans, cur / ref);
+                    ans = max(ans, product / ref);
                     if (ref > 0) {
-                        ref = cur;
+                        ref = product;
                     } else {
-                        ref = max(ref, cur);
+                        ref = max(ref, product);
                     }
                 }
-                prev = cur;
             }
         }
 
-        if (has_zero) {
-            ans = max(0, ans);
-        }
         return ans;
     }
 };
@@ -71,6 +66,7 @@ TEST_CASE("152. Maximum Product Subarray") {
     CHECK(s.maxProduct({0}) == 0);
     CHECK(s.maxProduct({0, 0}) == 0);
     CHECK(s.maxProduct({0, 0, 0}) == 0);
+    CHECK(s.maxProduct({0, -1, 0}) == 0);
     CHECK(s.maxProduct({1, 2, 0, 2, 3}) == 6);
     CHECK(s.maxProduct({1, -2, 0, -2, 3}) == 3);
     CHECK(s.maxProduct({1, -2, 1, -2, 3}) == 12);
