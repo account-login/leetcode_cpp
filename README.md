@@ -43,7 +43,7 @@ Solutions for leetcode using c++11.
 | Problem                                                                                                                                  | Answer                                           |  Time | Beats |
 |------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|-------|-------|
 | [60. Permutation Sequence](<https://leetcode.com/problems/permutation-sequence/>)                                                        | [perm_seq](<src/perm_seq.cpp>)                   |       |       |
-| [126. Word Ladder II](<https://leetcode.com/problems/word-ladder-ii/>)                                                                   | [word_ladder_ii](<src/word_ladder_ii.cpp>)       |       |       |
+| [126. Word Ladder II](<https://leetcode.com/problems/word-ladder-ii/>)                                                                   | [word_ladder_ii](<src/word_ladder_ii.cpp>)       | 272ms |   59% |
 | [149. Max Points on a Line](<https://leetcode.com/problems/max-points-on-a-line/>)                                                       | [max_points](<src/max_points.cpp>)               |       |       |
 | [146. LRU Cache](<https://leetcode.com/problems/lru-cache/>)                                                                             | [lru_cache](<src/lru_cache.cpp>)                 |       |       |
 | [29. Divide Two Integers](<https://leetcode.com/problems/divide-two-integers/>)                                                          | [div_int](<src/div_int.cpp>)                     |       |       |

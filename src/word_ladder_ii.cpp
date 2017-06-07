@@ -1,7 +1,8 @@
-#include <iostream>
-#include <unordered_map>
+#include <algorithm>
 #include <unordered_set>
-#include <stack>
+#include <limits>
+#include <iterator>
+#include <iostream>
 
 #ifdef RUN_TEST
 #   include "catch.hpp"
@@ -10,130 +11,11 @@
 #endif
 #include <cassert>
 
+
 // https://leetcode.com/problems/word-ladder-ii/
 
 
 using namespace std;
-
-
-class Node {
-public:
-    string word;
-    unordered_set<Node *> links;
-
-    explicit Node(const string &word) : word(word), links()
-    {}
-};
-
-
-void link(Node *n1, Node *n2) {
-    n1->links.insert(n2);
-    n2->links.insert(n1);
-}
-
-
-typedef vector<vector<string>> Results;
-typedef vector<Node *> Path;
-typedef vector<Path> PathList;
-typedef unordered_map<string, int> DistMap;
-typedef unordered_map<string, PathList> PathListMap;
-
-
-void add_path(
-    DistMap &dist_map,
-    PathListMap &path_list_map,
-    const PathList &from_path_list,
-    const Node &node,
-    int new_dist
-) {
-    dist_map[node.word] = new_dist;
-
-    if (path_list_map.find(node.word) == path_list_map.end()) {
-        path_list_map[node.word] = PathList();
-    }
-    PathList &target = path_list_map.find(node.word)->second;
-    for (auto &path : from_path_list) {
-        auto new_path = Path(path);
-        new_path.push_back((Node *)&node);
-
-        // check redundant path
-        bool redundant = false;
-        for (auto &old_target_path : target) {
-            if (old_target_path == new_path) {
-                redundant = true;
-                break;
-            }
-        }
-        if (!redundant) {
-            target.push_back(new_path);
-        }
-    }
-}
-
-
-vector<vector<string>> shortest_path(Node &begin, Node &end) {
-    // skip special case
-    if (begin.word == end.word) {
-        return {
-            { begin.word }
-        };
-    }
-
-    unordered_map<string, int> distances;
-    unordered_map<string, PathList> pathes;
-    distances[begin.word] = 0;
-    pathes[begin.word] = {
-        { &begin }
-    };
-
-    while (true) {
-        bool brk = false;
-
-        for (auto &path_list_kv : pathes) {
-            auto path_list = path_list_kv.second;
-            auto front_node = path_list.begin()->back();
-            int dist = distances.find(front_node->word)->second;
-            for (auto next : front_node->links) {
-                if (next->word == end.word) {
-                    brk = true;
-                }
-                int new_dist = dist + 1;
-                auto found = distances.find(next->word);
-                if (found == distances.end()) {
-                    // add new path
-                    add_path(distances, pathes, path_list, *next, new_dist);
-                } else {
-                    int prev_dist = found->second;
-                    if (prev_dist == new_dist) {
-                        // add new path
-                        add_path(distances, pathes, path_list, *next, new_dist);
-                    } else if (prev_dist > new_dist) {
-                        FAIL("should not reach here");
-                        // empty previous path and add new path
-                        pathes[front_node->word] = PathList();
-                        add_path(distances, pathes, path_list, *next, new_dist);
-                    }
-                }
-            }
-        }
-
-        if (brk) {
-            break;
-        }
-    }
-
-    auto pathes_to_end = pathes[end.word];
-    vector<vector<string>> ans;
-    for (auto path : pathes_to_end) {
-        vector<string> words;
-        for (auto node : path) {
-            words.push_back(node->word);
-        }
-        ans.push_back(words);
-    }
-
-    return ans;
-}
 
 
 bool word_cmp(const string &s1, const string &s2)
@@ -152,114 +34,172 @@ bool word_cmp(const string &s1, const string &s2)
 }
 
 
-pair<Node *, Node *> make_graph(string &begin_word, string &end_word, unordered_set<string> &wordList) {
-    vector<Node *> nodes;
-    Node *begin = nullptr;
-    Node *end = nullptr;
-
-    for (auto word : wordList) {
-        auto new_node = new Node(word);
-        for (auto node : nodes) {
-            if (word_cmp(word, node->word)) {
-                link(node, new_node);
+vector<vector<int>> make_graph(const vector<string> &words) {
+    vector<vector<int>> ans(words.size());
+    for (size_t j = 1; j < words.size(); ++j) {
+        for (size_t i = 0; i < j; ++i) {
+            if (word_cmp(words[i], words[j])) {
+                ans[i].push_back(static_cast<int>(j));
+                ans[j].push_back(static_cast<int>(i));
             }
         }
-        nodes.push_back(new_node);
-        if (new_node->word == begin_word) {
-            begin = new_node;
-        }
-        // begin_word may equals end_word
-        if (new_node->word == end_word) {
-            end = new_node;
-        }
     }
-
-    return make_pair(begin, end);
+    return ans;
 }
 
 
-void destroy_graph(Node *begin) {
-    unordered_set<Node *> visited_nodes;
-    stack<Node *> to_explore;
+vector<vector<int>> shortest_path(const vector<vector<int>> &graph, int begin, int end) {
+    vector<int> dist(graph.size(), numeric_limits<int>::max());
+    dist[begin] = 0;
+    vector<vector<int>> back_graph(graph.size());
 
-    to_explore.push(begin);
-    while (!to_explore.empty()) {
-        auto node = to_explore.top();
-        to_explore.pop();
-        auto found = visited_nodes.find(node) ;
-        if (found != visited_nodes.end()) {
-            // found
-        } else {
-            // not found
-            visited_nodes.insert(node);
-            for (auto child : node->links) {
-                to_explore.push(child);
+    vector<int> cur_level;
+    cur_level.push_back(begin);
+    vector<int> next_level;
+
+    while (!cur_level.empty()) {
+        for (int cur : cur_level) {
+            int cur_dist = dist[cur];
+            for (int next : graph[cur]) {
+                if (dist[next] == numeric_limits<int>::max()) {
+                    next_level.push_back(next);
+                }
+
+                if (cur_dist + 1 == dist[next]) {
+                    back_graph[next].push_back(cur);
+                } else if (cur_dist + 1 < dist[next]) {
+                    assert(back_graph[next].empty());
+                    back_graph[next].assign({cur});
+                    dist[next] = cur_dist + 1;
+                }
             }
-            delete node;
         }
+
+        if (find(next_level.begin(), next_level.end(), end) != next_level.end()) {
+            return back_graph;
+        }
+        cur_level.clear();
+        cur_level.swap(next_level);
+    }
+
+    // no path from begin to end
+    return {};
+}
+
+
+vector<vector<string>>
+back_graph_to_path(
+    const vector<vector<int>> &back_graph, int begin, int end, const vector<string> &words)
+{
+    if (begin == end) {
+        return {
+            {words[end]},
+        };
+    } else {
+        vector<vector<string>> ans;
+        for (int prev : back_graph[end]) {
+            vector<vector<string>> sub = back_graph_to_path(back_graph, begin, prev, words);
+            ans.reserve(ans.size() + sub.size());
+            for (vector<string> &subpath : sub) {
+                ans.emplace_back(move(subpath));
+            }
+        }
+        for (vector<string> &path : ans) {
+            path.emplace_back(words[end]);
+        }
+        return ans;
+    }
+}
+
+
+template<class T>
+int vector_unique_add(vector<T> &vec, const T &value) {
+    auto it = find(vec.cbegin(), vec.cend(), value);
+    if (it == vec.cend()) {
+        vec.emplace_back(value);
+        return static_cast<int>(vec.size() - 1);
+    } else {
+        return static_cast<int>(distance(vec.cbegin(), it));
     }
 }
 
 
 class Solution {
 public:
-    vector<vector<string>> findLadders(string beginWord, string endWord, unordered_set<string> &wordList) {
-        Node *begin;
-        Node *end;
-        auto extended_words = wordList;
-        extended_words.insert(beginWord);
-        extended_words.insert(endWord);
-        tie(begin, end) = make_graph(beginWord, endWord, extended_words);
+    vector<vector<string>>
+    findLadders(const string &begin_word, const string &end_word, vector<string> word_list) {
+        int begin = vector_unique_add(word_list, begin_word);
+        int end = static_cast<int>(
+            find(word_list.cbegin(), word_list.cend(), end_word) - word_list.cbegin()
+        );
+        if (end == static_cast<int>(word_list.size())) {
+            return {};
+        }
 
-        vector<vector<string>> ans = shortest_path(*begin, *end);
-        destroy_graph(begin);
-        return ans;
+        vector<vector<int>> graph = make_graph(word_list);
+        vector<vector<int>> back_graph = shortest_path(graph, begin, end);
+        if (back_graph.size() == 0) {
+            return {};
+        } else {
+            return back_graph_to_path(back_graph, begin, end, word_list);
+        }
     }
 };
 
 
 #ifdef RUN_TEST
-TEST_CASE( "126. Word Ladder II" ) {
-    CHECK(word_cmp("asdf", "asdb") == true);
-    CHECK(word_cmp("asdf", "asdf") == false);
-    CHECK(word_cmp("asdf", "asas") == false);
+TEST_CASE("126. Word Ladder II") {
+    CHECK(word_cmp("asdf", "asdb"));
+    CHECK(!word_cmp("asdf", "asdf"));
+    CHECK(!word_cmp("asdf", "asas"));
 
     Solution s;
-    unordered_set<string> words = {"hot", "dot", "dog", "lot", "log"};
+    vector<vector<string>> expects;
 
-    Node *begin;
-    Node *end;
-    string begin_word = "hit";
-    string end_word = "cog";
-    unordered_set<string> extended_words = words;
-    extended_words.insert(begin_word);
-    extended_words.insert(end_word);
+    auto solve = [&](
+        const string &word_begin, const string &word_end, const vector<string> &words)
+    {
+        auto ans = s.findLadders(word_begin, word_end, words);
+        sort(ans.begin(), ans.end());
+        return ans;
+    };
 
-    tie(begin, end) = make_graph(begin_word, end_word, extended_words);
-    CHECK(begin->links.size() == 1);
+    expects = {};
+    CHECK(solve("ab", "ba", {}) == expects);
+    CHECK(solve("ab", "ba", {"zz"}) == expects);
+    CHECK(solve("a", "b", {"zz"}) == expects);
 
-    auto node_hot = *(begin->links.begin());
-    CHECK(node_hot->word == "hot");
-    CHECK(node_hot->links.size() == 3);
-
-    Results results = s.findLadders("hit", "cog", words);
-    Results expects = {
+    expects = {
         {"hit", "hot", "dot", "dog", "cog"},
         {"hit", "hot", "lot", "log", "cog"}
     };
-    // BUG: should use set comparison
-    CHECK( results == expects );
+    CHECK(solve("hit", "cog", {"hot", "dot", "dog", "lot", "log", "cog"}) == expects);
 
-    words = {"hit", "hot"};
     expects = {
         {"hit", "hot"}
     };
-    CHECK(s.findLadders("hit", "hot", words) == expects);
+    CHECK(solve("hit", "hot", {"hit", "hot"}) == expects);
+    CHECK(solve("hit", "hot", {"hot"}) == expects);
+    CHECK(solve("hit", "hot", {"xxx", "hot"}) == expects);
 
-    words = {"hit"};
     expects = {
-        {"hit"}
+        {"xxxa", "xxxy", "xxzy", "xbzy", "abzy"},
     };
-    CHECK(s.findLadders("hit", "hit", words) == expects);
+    CHECK(solve("xxxa", "abzy", {"xbzy", "xxzy", "xxxy", "abzy"}) == expects);
+
+    expects = {
+        {"xxxx", "xxxa", "xxca", "yxca", "yxaa", "zxaa", "zzaa", "zzya", "zzyy"},
+        {"xxxx", "xxxa", "xxca", "yxca", "yxcb", "zxcb", "zzcb", "zzyb", "zzyy"},
+        {"xxxx", "xxxb", "xxab", "yxab", "yxaa", "zxaa", "zzaa", "zzya", "zzyy"},
+        {"xxxx", "xxxb", "xxab", "yxab", "yxcb", "zxcb", "zzcb", "zzyb", "zzyy"},
+    };
+    CHECK(solve("xxxx", "zzyy", {
+        "xxxa", "xxxb",
+        "xxca", "xxab", "yxca", "yxab",
+        "yxcb", "yxaa", "zxcb", "zxaa",
+        "zzcb", "zzaa",
+        "zzyb", "zzya",
+        "zzyy"
+    }) == expects);
 }
 #endif
