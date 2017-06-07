@@ -64,12 +64,8 @@ vector<vector<int>> shortest_path(const vector<vector<int>> &graph, int begin, i
                 if (dist[next] == numeric_limits<int>::max()) {
                     next_level.push_back(next);
                 }
-
-                if (cur_dist + 1 == dist[next]) {
+                if (cur_dist + 1 <= dist[next]) {
                     back_graph[next].push_back(cur);
-                } else if (cur_dist + 1 < dist[next]) {
-                    assert(back_graph[next].empty());
-                    back_graph[next].assign({cur});
                     dist[next] = cur_dist + 1;
                 }
             }
