@@ -104,4 +104,5 @@ Solutions for leetcode using c++11.
 | [327. Count of Range Sum](<https://leetcode.com/problems/count-of-range-sum/>)                                                           | [count_range_sum](<src/count_range_sum.cpp>)     |  19ms |   83% |
 | [523. Continuous Subarray Sum](<https://leetcode.com/problems/continuous-subarray-sum/>)                                                 | [sub_arr_sum](<src/sub_arr_sum.cpp>)             |  26ms |   75% |
 | [152. Maximum Product Subarray](<https://leetcode.com/problems/maximum-product-subarray/>)                                               | [max_product](<src/max_product.cpp>)             |   3ms |   62% |
+| [591. Tag Validator](<https://leetcode.com/problems/tag-validator/>)                                                                     | [tag_validator](<src/tag_validator.cpp>)         |   6ms |   37% |
 

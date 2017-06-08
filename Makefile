@@ -14,7 +14,7 @@ LEETCODES = perm_seq word_ladder_ii max_points lru_cache div_int frac2dec \
             tree_path_sum first_missing merge_k max_rect dup_num skyline \
             simp_path copy_list count_one clone_graph hash_dup course_ii \
             jump_ii rev_word circ_arr_loop lfu_cache count_rep rev_pairs \
-            count_range_sum sub_arr_sum max_product
+            count_range_sum sub_arr_sum max_product tag_validator
 
 all: $(LEETCODES)
 
